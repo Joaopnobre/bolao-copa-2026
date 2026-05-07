@@ -1,0 +1,7 @@
+{
+  "permissions": {
+    "allow": [
+      "PowerShell(New-Item -ItemType Directory -Force -Path \"D:\\\\Biblioteca\\\\Documentos\\\\Porgramas\\\\bolao-da-p\\\\prisma\\\\migrations\\\\20260101000000_init\")"
+    ]
+  }
+}

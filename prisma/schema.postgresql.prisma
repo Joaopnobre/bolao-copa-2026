@@ -1,0 +1,89 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id                 String              @id @default(cuid())
+  name               String
+  username           String              @unique
+  email              String              @unique
+  password           String
+  role               String              @default("PARTICIPANT")
+  isActive           Boolean             @default(true)
+  createdAt          DateTime            @default(now())
+  updatedAt          DateTime            @updatedAt
+  predictions        Prediction[]
+  specialPredictions SpecialPrediction[]
+  actionLogs         ActionLog[]
+}
+
+model Match {
+  id          String       @id @default(cuid())
+  homeTeam    String
+  awayTeam    String
+  matchDate   DateTime
+  phase       String       @default("GROUP")
+  groupName   String?
+  round       Int?
+  homeScore   Int?
+  awayScore   Int?
+  status      String       @default("UPCOMING")
+  sortOrder   Int          @default(0)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+  predictions Prediction[]
+}
+
+model Prediction {
+  id        String   @id @default(cuid())
+  userId    String
+  matchId   String
+  homeScore Int
+  awayScore Int
+  points    Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  match     Match    @relation(fields: [matchId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, matchId])
+}
+
+model SpecialPrediction {
+  id        String   @id @default(cuid())
+  userId    String
+  type      String
+  value     String
+  points    Float?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, type])
+}
+
+model ActionLog {
+  id        String   @id @default(cuid())
+  userId    String
+  userName  String
+  action    String
+  createdAt DateTime @default(now())
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model Rule {
+  id        String   @id @default(cuid())
+  key       String   @unique
+  content   String
+  updatedAt DateTime @updatedAt
+}
+
+model SystemConfig {
+  id    String @id @default(cuid())
+  key   String @unique
+  value String
+}

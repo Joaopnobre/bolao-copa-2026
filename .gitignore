@@ -30,8 +30,15 @@ yarn-debug.log*
 yarn-error.log*
 .pnpm-debug.log*
 
-# env files (can opt-in for committing if needed)
-.env*
+# env files — NUNCA commitar .env com credenciais reais
+.env
+.env.local
+.env.production
+# Estes arquivos de exemplo SÃO commitados (sem segredos):
+# .env.example → pode commitar
+# .env.sqlite  → pode commitar
+# .env.postgresql → NÃO commitar (tem credenciais)
+.env.postgresql
 
 # vercel
 .vercel
@@ -39,3 +46,11 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+/src/generated/prisma
+
+# SQLite — banco de dados local (nunca versionar)
+prisma/dev.db
+prisma/dev.db-shm
+prisma/dev.db-wal
+prisma/*.db

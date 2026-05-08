@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 interface RankingEntry {
@@ -85,9 +86,11 @@ export function RankingClient({ ranking, currentUserId }: Props) {
                   >
                     {player.name[0]}
                   </div>
-                  <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-primary)", marginBottom: 2 }}>
-                    {player.name}
-                  </div>
+                  <Link href={`/profile/${player.id}`} style={{ textDecoration: "none" }}>
+                    <div style={{ fontSize: 13, fontWeight: 700, color: "var(--verde-escuro)", marginBottom: 2, cursor: "pointer" }}>
+                      {player.name}
+                    </div>
+                  </Link>
                   <div
                     style={{
                       fontSize: 20,
@@ -220,10 +223,18 @@ export function RankingClient({ ranking, currentUserId }: Props) {
                   {entry.name[0]}
                 </div>
                 <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: isMe ? "#f5a623" : "var(--text-primary)" }}>
-                    {entry.name}
-                    {isMe && <span style={{ fontSize: 11, marginLeft: 6, color: "#60a5fa" }}>(você)</span>}
-                  </div>
+                  <Link
+                    href={`/profile/${entry.id}`}
+                    style={{ textDecoration: "none" }}
+                  >
+                    <div style={{ fontSize: 14, fontWeight: 600, color: isMe ? "#d4a000" : "var(--verde-escuro)", cursor: "pointer" }}
+                      onMouseEnter={(e) => (e.currentTarget.style.textDecoration = "underline")}
+                      onMouseLeave={(e) => (e.currentTarget.style.textDecoration = "none")}
+                    >
+                      {entry.name}
+                      {isMe && <span style={{ fontSize: 11, marginLeft: 6, color: "var(--azul-mid)" }}>(você)</span>}
+                    </div>
+                  </Link>
                   <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>@{entry.username}</div>
                 </div>
               </div>

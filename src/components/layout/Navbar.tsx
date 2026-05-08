@@ -120,7 +120,8 @@ export function Navbar() {
 
           {/* User info */}
           <div style={{ display: "flex", alignItems: "center", gap: 12, marginLeft: "auto" }}>
-            <div
+            <Link
+              href="/settings"
               style={{
                 display: "flex",
                 alignItems: "center",
@@ -129,21 +130,17 @@ export function Navbar() {
                 background: "rgba(255,255,255,0.15)",
                 border: "1px solid rgba(255,255,255,0.25)",
                 borderRadius: 8,
+                textDecoration: "none",
+                cursor: "pointer",
               }}
               className="hide-on-mobile"
             >
               <div
                 style={{
-                  width: 28,
-                  height: 28,
-                  borderRadius: "50%",
-                  background: "linear-gradient(135deg, #3b82f6, #8b5cf6)",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: 12,
-                  fontWeight: 700,
-                  color: "white",
+                  width: 28, height: 28, borderRadius: "50%",
+                  background: "linear-gradient(135deg, #F9C200, #d4a000)",
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                  fontSize: 12, fontWeight: 700, color: "#002776",
                 }}
               >
                 {session.user.name?.[0]?.toUpperCase() ?? "U"}
@@ -152,11 +149,12 @@ export function Navbar() {
                 <div style={{ fontSize: 12, fontWeight: 600, color: "white" }}>
                   {session.user.name}
                 </div>
-                {isAdmin && (
-                  <div style={{ fontSize: 10, color: "#fcd34d", fontWeight: 700 }}>ADMIN</div>
-                )}
+                {isAdmin
+                  ? <div style={{ fontSize: 10, color: "#fcd34d", fontWeight: 700 }}>ADMIN</div>
+                  : <div style={{ fontSize: 10, color: "rgba(255,255,255,0.6)" }}>⚙️ configurações</div>
+                }
               </div>
-            </div>
+            </Link>
 
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}

@@ -31,9 +31,9 @@ export function Navbar() {
   return (
     <nav
       style={{
-        background: "linear-gradient(135deg, #1e3a8a 0%, #4f46e5 50%, #7c3aed 100%)",
-        borderBottom: "none",
-        boxShadow: "0 4px 20px rgba(79,70,229,0.4)",
+        background: "linear-gradient(135deg, #002776 0%, #003da5 60%, #005a1e 100%)",
+        borderBottom: "3px solid #F9C200",
+        boxShadow: "0 4px 20px rgba(0,39,118,0.35)",
         position: "sticky",
         top: 0,
         zIndex: 50,
@@ -58,7 +58,7 @@ export function Navbar() {
                 style={{
                   fontSize: 14,
                   fontWeight: 800,
-                  background: "linear-gradient(135deg, #f59e0b, #d97706)",
+                  background: "linear-gradient(135deg, #F9C200, #d4a000)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   lineHeight: 1.1,

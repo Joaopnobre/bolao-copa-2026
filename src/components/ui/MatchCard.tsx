@@ -24,6 +24,7 @@ interface MatchCardProps {
   points?: number | null;
   expectedPts?: { exact: number; winner: number } | null;
   showPrediction?: boolean;
+  isViewer?: boolean;
   onClick?: () => void;
   compact?: boolean;
 }
@@ -59,6 +60,7 @@ export function MatchCard({
   points,
   expectedPts,
   showPrediction = true,
+  isViewer = false,
   onClick,
   compact = false,
 }: MatchCardProps) {
@@ -205,8 +207,9 @@ export function MatchCard({
               )}
             </div>
           ) : !locked && !finished ? (
-            <div style={{ textAlign: "center", fontSize: 12, color: "var(--azul-light)", fontWeight: 600 }}>
-              Toque para palpitar →
+            <div style={{ textAlign: "center", fontSize: 12, fontWeight: 600,
+              color: isViewer ? "#94a3b8" : "var(--azul-light)" }}>
+              {isViewer ? "👁️ Somente visualização" : "Toque para palpitar →"}
             </div>
           ) : (
             <div style={{ textAlign: "center", fontSize: 12, color: "#6b7280" }}>Sem palpite</div>

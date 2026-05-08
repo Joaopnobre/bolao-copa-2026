@@ -20,6 +20,7 @@ export default async function PredictionsPage() {
     <PredictionsClient
       matches={JSON.parse(JSON.stringify(matches))}
       userPredictions={JSON.parse(JSON.stringify(userPredictions))}
+      isViewer={session.user.role === "VIEWER"}
     />
   );
 }

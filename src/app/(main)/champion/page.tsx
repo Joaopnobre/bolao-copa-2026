@@ -48,6 +48,7 @@ export default async function ChampionPage() {
       officialChampion={champConfig?.value ?? null}
       officialScorer={scorerConfig?.value ?? null}
       lockTime={firstMatch ? firstMatch.matchDate.toISOString() : null}
+      isViewer={session.user.role === "VIEWER"}
     />
   );
 }

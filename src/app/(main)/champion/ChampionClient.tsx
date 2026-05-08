@@ -16,6 +16,7 @@ interface Props {
   officialChampion: string | null;
   officialScorer: string | null;
   lockTime: string | null;
+  isViewer?: boolean;
 }
 
 export function ChampionClient({
@@ -28,6 +29,7 @@ export function ChampionClient({
   officialChampion,
   officialScorer,
   lockTime,
+  isViewer = false,
 }: Props) {
   const router = useRouter();
   const [champion, setChampion] = useState(championPred?.value ?? "");
@@ -114,6 +116,7 @@ export function ChampionClient({
           icon="👑"
           title="Campeão da Copa"
           description="Qual seleção vai vencer a Copa do Mundo 2026?"
+          isViewer={isViewer}
           points={15}
           locked={locked}
           value={champion}
@@ -128,6 +131,7 @@ export function ChampionClient({
           icon="⚽"
           title="Artilheiro da Copa"
           description="Quem vai ser o artilheiro da Copa do Mundo 2026?"
+          isViewer={isViewer}
           points={15}
           locked={locked}
           value={scorer}
@@ -138,7 +142,7 @@ export function ChampionClient({
         />
       </div>
 
-      {!locked && (
+      {!locked && !isViewer && (
         <div>
           {feedback && (
             <div
@@ -190,11 +194,11 @@ export function ChampionClient({
 }
 
 function SpecialCard({
-  icon, title, description, points, locked, value, onChange, savedValue, officialValue, predPoints,
+  icon, title, description, points, locked, value, onChange, savedValue, officialValue, predPoints, isViewer,
 }: {
   icon: string; title: string; description: string; points: number;
   locked: boolean; value: string; onChange: (v: string) => void;
-  savedValue?: string; officialValue?: string | null; predPoints?: number | null;
+  savedValue?: string; officialValue?: string | null; predPoints?: number | null; isViewer?: boolean;
 }) {
   const isCorrect = officialValue && savedValue &&
     normalizeText(savedValue) === normalizeText(officialValue);
@@ -233,7 +237,7 @@ function SpecialCard({
         Vale até {points} pontos (mínimo {points / 2} pts com odds)
       </div>
 
-      {!locked ? (
+      {!locked && !isViewer ? (
         <input
           className="input-field"
           type="text"

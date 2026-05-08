@@ -10,9 +10,10 @@ import { calculateOdd, ODDS_CONFIG } from "@/lib/odds";
 interface Props {
   matches: any[];
   userPredictions: any[];
+  isViewer?: boolean;
 }
 
-export function PredictionsClient({ matches, userPredictions }: Props) {
+export function PredictionsClient({ matches, userPredictions, isViewer }: Props) {
   const router = useRouter();
   const [filter, setFilter] = useState<"all" | "pending" | "done">("all");
   const [bulkOdds, setBulkOdds] = useState<Record<string, { counts: Record<string, number>; total: number }>>({});
@@ -63,6 +64,16 @@ export function PredictionsClient({ matches, userPredictions }: Props) {
 
   return (
     <div>
+      {isViewer && (
+        <div style={{
+          background: "rgba(148,163,184,0.12)", border: "1.5px solid #94a3b8",
+          borderRadius: 10, padding: "10px 16px", marginBottom: 20,
+          display: "flex", alignItems: "center", gap: 10, fontSize: 13, color: "#64748b",
+        }}>
+          <span style={{ fontSize: 18 }}>👁️</span>
+          <span><strong>Modo visualização</strong> — você pode ver os palpites mas não pode palpitar.</span>
+        </div>
+      )}
       <PageHeader
         title="Meus Palpites"
         subtitle="Gerencie seus palpites para os jogos"
@@ -146,7 +157,8 @@ export function PredictionsClient({ matches, userPredictions }: Props) {
                 prediction={pred ?? null}
                 expectedPts={getExpectedPts(match.id, pred)}
                 showPrediction
-                onClick={() => router.push(`/predictions/${match.id}`)}
+                isViewer={isViewer}
+                onClick={isViewer ? undefined : () => router.push(`/predictions/${match.id}`)}
               />
             );
           })}

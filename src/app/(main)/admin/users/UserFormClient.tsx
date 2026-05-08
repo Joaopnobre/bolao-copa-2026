@@ -103,6 +103,7 @@ export function UserFormClient({ user }: Props) {
               <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>Tipo</label>
               <select className="input-field" value={role} onChange={(e) => setRole(e.target.value)}>
                 <option value="PARTICIPANT">Participante</option>
+                <option value="VIEWER">Visualizador (só leitura)</option>
                 <option value="ADMIN">Administrador</option>
               </select>
             </div>

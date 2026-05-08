@@ -1,34 +1,32 @@
 @import "tailwindcss";
 
-/* ── Paleta inspirada na Bandeira do Brasil ──────────────
-   Verde:     #009C3B  (verde da bandeira)
-   Ouro:      #F9C200  (amarelo do losango)
-   Azul:      #002776  (azul do círculo)
-   Branco:    #FFFFFF
+/* ── Paleta Bandeira do Brasil ───────────────────────────
+   Verde:  #009C3B  ← cor dominante
+   Ouro:   #F9C200  ← destaque / acento
+   Azul:   #002776  ← secundário
    ──────────────────────────────────────────────────────── */
-
 :root {
-  --verde:       #009C3B;
-  --verde-light: #00b845;
-  --verde-bg:    #f0fdf6;
-  --ouro:        #F9C200;
-  --ouro-light:  #ffe44d;
-  --ouro-dark:   #d4a000;
-  --azul:        #002776;
-  --azul-mid:    #003da5;
-  --azul-light:  #1a56db;
+  --verde:        #009C3B;
+  --verde-escuro: #007a2f;
+  --verde-claro:  #00c44a;
+  --verde-bg:     #e8f7ee;
+  --verde-bg2:    #d1f0de;
+  --ouro:         #F9C200;
+  --ouro-escuro:  #d4a000;
+  --ouro-bg:      #fffbeb;
+  --azul:         #002776;
+  --azul-mid:     #1a56db;
 
-  --bg-primary:      #f4fbf7;
-  --bg-secondary:    #e8f7ee;
+  --bg-primary:      #f0faf4;
+  --bg-secondary:    #e0f2ea;
   --bg-card:         #ffffff;
-  --bg-card-hover:   #f0fdf6;
+  --bg-card-hover:   #f0faf4;
   --accent-gold:     #F9C200;
   --accent-green:    #009C3B;
   --accent-blue:     #002776;
-  --accent-purple:   #5b21b6;
-  --text-primary:    #0a1a0f;
-  --text-secondary:  #3d5a47;
-  --border-color:    #b7e4c7;
+  --text-primary:    #052e16;
+  --text-secondary:  #166534;
+  --border-color:    #86efac;
   --border-highlight:#009C3B;
 }
 
@@ -44,9 +42,9 @@ html { scroll-behavior: smooth; }
 body {
   background-color: var(--bg-primary);
   background-image:
-    radial-gradient(ellipse 90% 40% at 50% -5%,  rgba(0,156,59,0.1)  0%, transparent 60%),
-    radial-gradient(ellipse 50% 30% at 95% 95%,  rgba(0,39,118,0.07) 0%, transparent 55%),
-    radial-gradient(ellipse 40% 25% at 5%  80%,  rgba(249,194,0,0.07) 0%, transparent 50%);
+    radial-gradient(ellipse 90% 40% at 50% -5%,  rgba(0,156,59,0.15)  0%, transparent 60%),
+    radial-gradient(ellipse 50% 30% at 95% 95%,  rgba(0,39,118,0.08)  0%, transparent 55%),
+    radial-gradient(ellipse 40% 25% at 5%  80%,  rgba(249,194,0,0.08) 0%, transparent 50%);
   color: var(--text-primary);
   font-family: var(--font-sans), ui-sans-serif, system-ui, sans-serif;
   min-height: 100vh;
@@ -55,9 +53,9 @@ body {
 
 /* ── Scrollbar ── */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
-::-webkit-scrollbar-track { background: var(--bg-secondary); }
-::-webkit-scrollbar-thumb { background: #74c99a; border-radius: 3px; }
-::-webkit-scrollbar-thumb:hover { background: var(--verde); }
+::-webkit-scrollbar-track { background: var(--verde-bg); }
+::-webkit-scrollbar-thumb { background: var(--verde); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--verde-escuro); }
 
 /* ── Animations ── */
 @keyframes shimmer {
@@ -81,18 +79,20 @@ body {
 .animate-fade-in    { animation: fadeIn  0.25s ease-out; }
 .animate-pulse-glow { animation: pulse-glow 2s infinite; }
 
-/* ── Cards ── */
+/* ── Cards — borda esquerda verde + hover verde ── */
 .card {
   background: var(--bg-card);
   border: 1.5px solid var(--border-color);
+  border-left: 4px solid var(--verde);
   border-radius: 14px;
-  box-shadow: 0 2px 10px rgba(0,156,59,0.08);
+  box-shadow: 0 2px 10px rgba(0,156,59,0.1);
   transition: all 0.22s ease;
 }
 .card:hover {
   border-color: var(--verde);
+  border-left-color: var(--ouro);
   transform: translateY(-2px);
-  box-shadow: 0 8px 28px rgba(0,156,59,0.18);
+  box-shadow: 0 8px 28px rgba(0,156,59,0.22);
 }
 
 /* ── Gold text ── */
@@ -126,18 +126,17 @@ body {
   transition: all 0.2s;
   width: 100%;
   outline: none;
-  box-shadow: 0 1px 3px rgba(0,0,0,0.05);
 }
 .input-field:focus {
   border-color: var(--verde);
-  box-shadow: 0 0 0 3px rgba(0,156,59,0.15);
+  box-shadow: 0 0 0 3px rgba(0,156,59,0.18);
 }
 .input-field::placeholder { color: #86b899; }
 .input-field option { background: white; color: var(--text-primary); }
 
 /* ── Buttons ── */
 .btn-primary {
-  background: linear-gradient(135deg, #00b845, #007a2f);
+  background: linear-gradient(135deg, var(--verde-claro), var(--verde-escuro));
   color: white;
   border: none;
   border-radius: 9px;
@@ -150,16 +149,16 @@ body {
   gap: 8px;
   box-shadow: 0 3px 12px rgba(0,156,59,0.4);
 }
-.btn-primary:hover  { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,156,59,0.55); }
+.btn-primary:hover  { transform: translateY(-2px); box-shadow: 0 6px 22px rgba(0,156,59,0.55); }
 .btn-primary:active { transform: translateY(0); }
 
 .btn-gold {
-  background: linear-gradient(135deg, #F9C200, #d4a000);
-  color: #002776;
+  background: linear-gradient(135deg, var(--ouro), var(--ouro-escuro));
+  color: var(--azul);
   font-weight: 800;
   box-shadow: 0 3px 12px rgba(249,194,0,0.45);
 }
-.btn-gold:hover { box-shadow: 0 6px 20px rgba(249,194,0,0.65); }
+.btn-gold:hover { box-shadow: 0 6px 22px rgba(249,194,0,0.65); }
 
 .btn-danger {
   background: linear-gradient(135deg, #ef4444, #b91c1c);
@@ -170,17 +169,16 @@ body {
 
 .btn-ghost {
   background: white;
-  color: var(--text-secondary);
+  color: var(--verde-escuro);
   border: 1.5px solid var(--border-color);
   border-radius: 9px;
   padding: 10px 20px;
-  font-weight: 500;
+  font-weight: 600;
   cursor: pointer;
   transition: all 0.2s;
 }
 .btn-ghost:hover {
   border-color: var(--verde);
-  color: var(--verde);
   background: var(--verde-bg);
 }
 
@@ -193,12 +191,12 @@ body {
   font-weight: 700;
   background: white;
   border: 2px solid var(--border-color);
-  color: var(--azul);
+  color: var(--verde-escuro);
   border-radius: 10px;
   outline: none;
   transition: all 0.2s;
   -moz-appearance: textfield;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.07);
+  box-shadow: 0 2px 6px rgba(0,156,59,0.1);
 }
 .score-input::-webkit-inner-spin-button,
 .score-input::-webkit-outer-spin-button { -webkit-appearance: none; }
@@ -211,41 +209,40 @@ body {
 .table-container { overflow-x: auto; border-radius: 14px; }
 .data-table { width: 100%; border-collapse: collapse; }
 .data-table th {
-  background: #e8f7ee;
-  color: #1a5c33;
+  background: linear-gradient(135deg, var(--verde), var(--verde-escuro));
+  color: white;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 0.8px;
   text-transform: uppercase;
   padding: 12px 16px;
   text-align: left;
-  border-bottom: 2px solid var(--border-color);
 }
 .data-table td {
   padding: 12px 16px;
-  border-bottom: 1px solid #e8f7ee;
+  border-bottom: 1px solid var(--verde-bg);
   font-size: 14px;
 }
 .data-table tr:last-child td { border-bottom: none; }
-.data-table tr:hover td { background: #f0fdf6; }
+.data-table tr:hover td { background: var(--verde-bg); }
 
 /* ── Phase labels ── */
-.phase-GROUP         { color: #007a2f; font-weight: 600; }
-.phase-ROUND_OF_16   { color: #003da5; font-weight: 600; }
-.phase-QUARTER_FINAL { color: #d4a000; font-weight: 600; }
-.phase-SEMI_FINAL    { color: #ea580c; font-weight: 600; }
-.phase-THIRD_PLACE   { color: #059669; font-weight: 600; }
-.phase-FINAL         { color: #002776; font-weight: 700; }
+.phase-GROUP         { color: var(--verde-escuro); font-weight: 600; }
+.phase-ROUND_OF_16   { color: var(--azul);         font-weight: 600; }
+.phase-QUARTER_FINAL { color: var(--ouro-escuro);  font-weight: 600; }
+.phase-SEMI_FINAL    { color: #ea580c;              font-weight: 600; }
+.phase-THIRD_PLACE   { color: var(--verde);         font-weight: 600; }
+.phase-FINAL         { color: var(--azul);          font-weight: 700; }
 
 /* ── Status badges ── */
-.status-UPCOMING { background: #dcfce7; color: #15803d; font-weight: 600; }
-.status-LOCKED   { background: #fef9c3; color: #854d0e; font-weight: 600; }
-.status-FINISHED { background: #dbeafe; color: #1e40af; font-weight: 600; }
+.status-UPCOMING { background: var(--verde-bg);  color: var(--verde-escuro); font-weight: 700; }
+.status-LOCKED   { background: var(--ouro-bg);   color: #854d0e;             font-weight: 700; }
+.status-FINISHED { background: #dbeafe;           color: var(--azul);         font-weight: 700; }
 
 /* ── Points ── */
-.points-exact  { color: #d4a000; font-weight: 700; }
-.points-winner { color: #007a2f; font-weight: 700; }
-.points-none   { color: #86b899; }
+.points-exact  { color: var(--ouro-escuro); font-weight: 700; }
+.points-winner { color: var(--verde);       font-weight: 700; }
+.points-none   { color: #94a3b8; }
 
 /* ── Ranking ── */
 .rank-1 { background: linear-gradient(135deg, #F9C200, #d4a000); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
@@ -254,19 +251,19 @@ body {
 
 /* ── Skeleton ── */
 .loading-skeleton {
-  background: linear-gradient(90deg, #e8f7ee 25%, #d1f0de 50%, #e8f7ee 75%);
+  background: linear-gradient(90deg, var(--verde-bg) 25%, var(--verde-bg2) 50%, var(--verde-bg) 75%);
   background-size: 200% 100%;
   animation: shimmer 1.5s infinite;
   border-radius: 6px;
 }
 
 /* ── Nav links ── */
-.nav-link { color: rgba(255,255,255,0.75); transition: all 0.2s; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 500; }
-.nav-link:hover  { color: white; background: rgba(255,255,255,0.15); }
-.nav-link.active { color: white; background: rgba(255,255,255,0.2); font-weight: 600; }
+.nav-link { color: rgba(255,255,255,0.8); transition: all 0.2s; padding: 8px 12px; border-radius: 8px; font-size: 14px; font-weight: 500; }
+.nav-link:hover  { color: var(--ouro); background: rgba(255,255,255,0.12); }
+.nav-link.active { color: var(--ouro); background: rgba(249,194,0,0.15); border: 1px solid rgba(249,194,0,0.3); font-weight: 700; }
 
 /* ── Alerts ── */
-.alert-success { background: #f0fdf4; border: 1.5px solid #86efac; color: #15803d; border-radius: 10px; padding: 12px 16px; }
-.alert-error   { background: #fef2f2; border: 1.5px solid #fca5a5; color: #dc2626; border-radius: 10px; padding: 12px 16px; }
-.alert-info    { background: #eff6ff; border: 1.5px solid #93c5fd; color: #1d4ed8; border-radius: 10px; padding: 12px 16px; }
-.alert-warning { background: #fefce8; border: 1.5px solid #fde047; color: #854d0e; border-radius: 10px; padding: 12px 16px; }
+.alert-success { background: var(--verde-bg);  border: 1.5px solid #86efac; color: var(--verde-escuro); border-radius: 10px; padding: 12px 16px; }
+.alert-error   { background: #fef2f2;           border: 1.5px solid #fca5a5; color: #dc2626;             border-radius: 10px; padding: 12px 16px; }
+.alert-info    { background: #eff6ff;           border: 1.5px solid #93c5fd; color: var(--azul);         border-radius: 10px; padding: 12px 16px; }
+.alert-warning { background: var(--ouro-bg);    border: 1.5px solid #fcd34d; color: #854d0e;             border-radius: 10px; padding: 12px 16px; }

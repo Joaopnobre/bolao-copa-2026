@@ -31,9 +31,9 @@ export function Navbar() {
   return (
     <nav
       style={{
-        background: "linear-gradient(135deg, #002776 0%, #003da5 60%, #005a1e 100%)",
-        borderBottom: "3px solid #F9C200",
-        boxShadow: "0 4px 20px rgba(0,39,118,0.35)",
+        background: "linear-gradient(135deg, #007a2f 0%, #009C3B 50%, #00b845 100%)",
+        borderBottom: "4px solid #F9C200",
+        boxShadow: "0 4px 20px rgba(0,156,59,0.45)",
         position: "sticky",
         top: 0,
         zIndex: 50,

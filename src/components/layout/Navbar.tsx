@@ -66,7 +66,14 @@ export function Navbar() {
               >
                 BOLÃO
               </div>
-              <div style={{ fontSize: 10, color: "#F9C200", letterSpacing: 2, lineHeight: 1, fontWeight: 700 }}>
+              <div style={{
+                fontSize: 11,
+                letterSpacing: 2,
+                lineHeight: 1,
+                fontWeight: 800,
+                color: "#FFE500",
+                textShadow: "0 1px 4px rgba(0,0,0,0.4)",
+              }}>
                 COPA 2026
               </div>
             </div>

@@ -31,6 +31,16 @@ const MatchPhase = {
   FINAL: "FINAL",
 } as const;
 
+// Converte texto com acentos em slug ASCII seguro para URLs e IDs
+function slugify(text: string): string {
+  return text
+    .normalize("NFD")                    // decompõe acentos: "é" → "e" + combining accent
+    .replace(/[̀-ͯ]/g, "")     // remove os combining accents
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")         // qualquer não-alfanumérico vira "-"
+    .replace(/^-|-$/g, "");              // remove hífens nas pontas
+}
+
 // Copa do Mundo 2026 - dates from spreadsheet (Excel serial date 46184 = June 11, 2026)
 // Excel date 46184 = 2026-06-11
 function excelDate(serial: number, timeStr: string): Date {
@@ -192,13 +202,12 @@ async function main() {
   let sortOrder = 0;
   for (const m of matches) {
     const matchDate = excelDate(m.excelDay, m.time);
+    const matchId = `grp-${slugify(m.groupName)}-${slugify(m.homeTeam)}-vs-${slugify(m.awayTeam)}`;
     await prisma.match.upsert({
-      where: {
-        id: `group-${m.groupName}-${m.homeTeam}-${m.awayTeam}`.replace(/\s/g, "-").toLowerCase(),
-      },
+      where: { id: matchId },
       update: { matchDate },
       create: {
-        id: `group-${m.groupName}-${m.homeTeam}-${m.awayTeam}`.replace(/\s/g, "-").toLowerCase(),
+        id: matchId,
         homeTeam: m.homeTeam,
         awayTeam: m.awayTeam,
         matchDate,
@@ -214,7 +223,7 @@ async function main() {
 
   for (const m of knockoutMatches) {
     const matchDate = excelDate(m.excelDay, m.time);
-    const safeId = `knockout-${m.phase}-${m.homeTeam}-${m.awayTeam}`.replace(/\s/g, "-").replace(/[^a-z0-9-]/gi, "").toLowerCase();
+    const safeId = `ko-${slugify(m.phase)}-${slugify(m.homeTeam)}-vs-${slugify(m.awayTeam)}`;
     await prisma.match.upsert({
       where: { id: safeId },
       update: { matchDate },

@@ -163,7 +163,7 @@ export function RankingClient({ ranking, currentUserId }: Props) {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800 }}>💰 Pote do Bolão</div>
-                <div style={{ fontSize: 12, opacity: 0.8 }}>{ranking.length} participantes × R$ {ENTRY},00</div>
+                <div style={{ fontSize: 12, opacity: 0.8 }}>{ranking.length} participantes ativos × R$ {ENTRY},00</div>
               </div>
               <div style={{
                 background: "rgba(249,194,0,0.2)", border: "2px solid #F9C200",

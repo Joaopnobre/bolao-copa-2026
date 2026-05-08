@@ -37,29 +37,20 @@ export function PredictionsClient({ matches, userPredictions }: Props) {
     return () => clearInterval(interval);
   }, [openMatchIds.join(",")]);
 
-  // Calcula pontuação esperada para o palpite do usuário em um jogo
+  // Calcula pontuação esperada — ambas (exato e vencedor) usam o mesmo k
+  // k = quantas pessoas palpitaram aquele placar específico
   function getExpectedPts(matchId: string, pred: { homeScore: number; awayScore: number } | undefined) {
     if (!pred) return null;
     const oddData = bulkOdds[matchId];
     if (!oddData) return null;
-    const N = Math.max(oddData.total, 1);
-
-    // Placar exato
+    const N   = Math.max(oddData.total, 1);
     const key = `${pred.homeScore}-${pred.awayScore}`;
-    const kExact = Math.max(oddData.counts[key] ?? 1, 1);
-    const exact = ODDS_CONFIG.POINTS.EXACT_SCORE * calculateOdd(kExact, N);
-
-    // Vencedor/empate
-    const predW = pred.homeScore > pred.awayScore ? "home" : pred.awayScore > pred.homeScore ? "away" : "draw";
-    let kWinner = 0;
-    for (const [sc, cnt] of Object.entries(oddData.counts)) {
-      const [sh, sa] = sc.split("-").map(Number);
-      const w = sh > sa ? "home" : sa > sh ? "away" : "draw";
-      if (w === predW) kWinner += cnt;
-    }
-    const winner = ODDS_CONFIG.POINTS.WINNER * calculateOdd(Math.max(kWinner, 1), N);
-
-    return { exact, winner };
+    const k   = Math.max(oddData.counts[key] ?? 1, 1);
+    const odd = calculateOdd(k, N);
+    return {
+      exact:  ODDS_CONFIG.POINTS.EXACT_SCORE * odd,
+      winner: ODDS_CONFIG.POINTS.WINNER * odd,
+    };
   }
 
   const openMatches = matches.filter((m) => !isMatchLocked(new Date(m.matchDate)) && m.status !== "FINISHED");

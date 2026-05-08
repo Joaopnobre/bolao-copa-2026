@@ -1,7 +1,7 @@
 // Odds formula: odd = max(MIN_ODD, 1 - 0.5 * ((k-1)/(N-1))^POWER)
-// k = count of people who made the same prediction
-// N = total participants
-// Derived from spreadsheet: k=10, N=20 → 0.7249819926053037 exactly
+// k = quantas pessoas palpitaram EXATAMENTE o mesmo placar
+// N = total de participantes
+// Derivado da planilha: k=10, N=20 → 0.7249819926053037 exato
 
 export const ODDS_CONFIG = {
   POWER: 0.8,
@@ -22,13 +22,16 @@ export function calculateOdd(k: number, N: number): number {
   return Math.max(ODDS_CONFIG.MIN_ODD, odd);
 }
 
+// REGRA: tanto placar exato quanto vencedor/empate usam o mesmo k —
+// quantas pessoas palpitaram AQUELE placar específico.
+// Ex: jogo termina 1x0. Quem palpitou 2x1 compete só com quem
+// também palpitou 2x1 (não com quem palpitou 3x0, mesmo vencedor).
 export function calculateMatchPoints(
   predHome: number,
   predAway: number,
   actualHome: number,
   actualAway: number,
-  k_exact: number,
-  k_winner: number,
+  k_exact: number, // pessoas com o mesmo placar exato
   N: number
 ): { points: number; type: "exact" | "winner" | "none" } {
   const isExact = predHome === actualHome && predAway === actualAway;
@@ -39,18 +42,11 @@ export function calculateMatchPoints(
     predHome > predAway ? "home" : predAway > predHome ? "away" : "draw";
   const isWinner = predWinner === actualWinner;
 
-  if (isExact) {
-    const odd = calculateOdd(k_exact, N);
-    const pts = ODDS_CONFIG.POINTS.EXACT_SCORE * odd;
-    return { points: pts, type: "exact" };
-  }
+  // odd calculada sempre sobre o placar específico (k_exact)
+  const odd = calculateOdd(k_exact, N);
 
-  if (isWinner) {
-    const odd = calculateOdd(k_winner, N);
-    const pts = ODDS_CONFIG.POINTS.WINNER * odd;
-    return { points: pts, type: "winner" };
-  }
-
+  if (isExact) return { points: ODDS_CONFIG.POINTS.EXACT_SCORE * odd, type: "exact" };
+  if (isWinner) return { points: ODDS_CONFIG.POINTS.WINNER * odd, type: "winner" };
   return { points: 0, type: "none" };
 }
 
@@ -64,6 +60,5 @@ export function calculateSpecialPoints(
   if (predValue.toLowerCase().trim() !== actualValue.toLowerCase().trim()) return 0;
   const base =
     type === "CHAMPION" ? ODDS_CONFIG.POINTS.CHAMPION : ODDS_CONFIG.POINTS.TOP_SCORER;
-  const odd = calculateOdd(k, N);
-  return base * odd;
+  return base * calculateOdd(k, N);
 }

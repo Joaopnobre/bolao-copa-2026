@@ -31,10 +31,9 @@ export function Navbar() {
   return (
     <nav
       style={{
-        background: "rgba(255,255,255,0.95)",
-        borderBottom: "1px solid var(--border-color)",
-        backdropFilter: "blur(12px)",
-        boxShadow: "0 1px 8px rgba(0,0,0,0.08)",
+        background: "linear-gradient(135deg, #1e3a8a 0%, #4f46e5 50%, #7c3aed 100%)",
+        borderBottom: "none",
+        boxShadow: "0 4px 20px rgba(79,70,229,0.4)",
         position: "sticky",
         top: 0,
         zIndex: 50,
@@ -98,9 +97,9 @@ export function Navbar() {
                     textDecoration: "none",
                     fontSize: 13,
                     fontWeight: 500,
-                    color: active ? "#2563eb" : "var(--text-secondary)",
-                    background: active ? "#dbeafe" : "transparent",
-                    border: active ? "1px solid #93c5fd" : "1px solid transparent",
+                    color: active ? "#ffffff" : "rgba(255,255,255,0.75)",
+                    background: active ? "rgba(255,255,255,0.2)" : "transparent",
+                    border: active ? "1px solid rgba(255,255,255,0.35)" : "1px solid transparent",
                     transition: "all 0.2s",
                     whiteSpace: "nowrap",
                   }}
@@ -120,8 +119,8 @@ export function Navbar() {
                 alignItems: "center",
                 gap: 8,
                 padding: "6px 12px",
-                background: "var(--bg-card)",
-                border: "1px solid var(--border-color)",
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.25)",
                 borderRadius: 8,
               }}
               className="hide-on-mobile"
@@ -143,11 +142,11 @@ export function Navbar() {
                 {session.user.name?.[0]?.toUpperCase() ?? "U"}
               </div>
               <div>
-                <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-primary)" }}>
+                <div style={{ fontSize: 12, fontWeight: 600, color: "white" }}>
                   {session.user.name}
                 </div>
                 {isAdmin && (
-                  <div style={{ fontSize: 10, color: "#d97706", fontWeight: 700 }}>ADMIN</div>
+                  <div style={{ fontSize: 10, color: "#fcd34d", fontWeight: 700 }}>ADMIN</div>
                 )}
               </div>
             </div>
@@ -155,9 +154,9 @@ export function Navbar() {
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
               style={{
-                background: "#fef2f2",
-                border: "1px solid #fca5a5",
-                color: "#f87171",
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                color: "rgba(255,255,255,0.9)",
                 borderRadius: 8,
                 padding: "6px 12px",
                 cursor: "pointer",
@@ -173,9 +172,9 @@ export function Navbar() {
             <button
               onClick={() => setMenuOpen(!menuOpen)}
               style={{
-                background: "var(--bg-card)",
-                border: "1px solid var(--border-color)",
-                color: "var(--text-primary)",
+                background: "rgba(255,255,255,0.15)",
+                border: "1px solid rgba(255,255,255,0.3)",
+                color: "white",
                 borderRadius: 8,
                 padding: "8px",
                 cursor: "pointer",
@@ -242,7 +241,7 @@ export function Navbar() {
                 style={{
                   background: "rgba(239,68,68,0.1)",
                   border: "1px solid rgba(239,68,68,0.3)",
-                  color: "#f87171",
+                  color: "rgba(255,255,255,0.9)",
                   borderRadius: 8,
                   padding: "6px 12px",
                   cursor: "pointer",

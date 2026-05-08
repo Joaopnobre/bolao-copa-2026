@@ -50,6 +50,17 @@ export function calculateMatchPoints(
   return { points: 0, type: "none" };
 }
 
+// Normaliza texto para comparação: remove acentos, minúsculas, trim
+// "Vinícius Jr.", "vinicius jr", "VINICIUS JR" → "vinicius jr"
+export function normalizeText(text: string): string {
+  return text
+    .normalize("NFD")
+    .replace(/[̀-ͯ]/g, "")
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, " ");
+}
+
 export function calculateSpecialPoints(
   predValue: string,
   actualValue: string,
@@ -57,7 +68,7 @@ export function calculateSpecialPoints(
   N: number,
   type: "CHAMPION" | "TOP_SCORER"
 ): number {
-  if (predValue.toLowerCase().trim() !== actualValue.toLowerCase().trim()) return 0;
+  if (normalizeText(predValue) !== normalizeText(actualValue)) return 0;
   const base =
     type === "CHAMPION" ? ODDS_CONFIG.POINTS.CHAMPION : ODDS_CONFIG.POINTS.TOP_SCORER;
   return base * calculateOdd(k, N);

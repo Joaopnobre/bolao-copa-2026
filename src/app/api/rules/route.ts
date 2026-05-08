@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logAction } from "@/lib/actionLog";
+import { logAction, getIp } from "@/lib/actionLog";
 import { NextResponse } from "next/server";
 
 export async function PUT(req: Request) {
@@ -18,7 +18,7 @@ export async function PUT(req: Request) {
     update: { content },
   });
 
-  await logAction(session.user.id, session.user.name ?? "", "atualizou as regras do bolão");
+  await logAction(session.user.id, session.user.name ?? "", "atualizou as regras do bolão", getIp(req));
 
   return NextResponse.json({ success: true });
 }

@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logAction } from "@/lib/actionLog";
+import { logAction, getIp } from "@/lib/actionLog";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
@@ -27,7 +27,7 @@ export async function PUT(req: Request) {
   const hashed = await bcrypt.hash(newPassword, 12);
   await prisma.user.update({ where: { id: user.id }, data: { password: hashed } });
 
-  await logAction(session.user.id, session.user.name ?? "", "alterou a própria senha");
+  await logAction(session.user.id, session.user.name ?? "", "alterou a própria senha", getIp(req));
 
   return NextResponse.json({ success: true });
 }

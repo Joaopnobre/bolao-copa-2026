@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logAction } from "@/lib/actionLog";
+import { logAction, getIp } from "@/lib/actionLog";
 import bcrypt from "bcryptjs";
 import { NextResponse } from "next/server";
 
@@ -44,7 +44,7 @@ export async function DELETE(
   }
 
   const user = await prisma.user.delete({ where: { id } });
-  await logAction(session.user.id, session.user.name ?? "", `excluiu usuário ${user.name}`);
+  await logAction(session.user.id, session.user.name ?? "", `excluiu usuário ${user.name}`, getIp(req));
 
   return NextResponse.json({ success: true });
 }

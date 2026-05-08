@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logAction } from "@/lib/actionLog";
+import { logAction, getIp } from "@/lib/actionLog";
 import { recalculateMatchScores, recalculateSpecialScores } from "@/lib/scoring";
 import { NextResponse } from "next/server";
 
@@ -34,7 +34,7 @@ export async function POST(req: Request) {
     session.user.id,
     session.user.name ?? "",
     `inseriu resultado ${match.homeTeam} ${homeScore}×${awayScore} ${match.awayTeam}`
-  );
+  , getIp(req));
 
   return NextResponse.json(match);
 }
@@ -55,7 +55,7 @@ export async function PUT(req: Request) {
       update: { value: champion },
     });
     await recalculateSpecialScores("CHAMPION", champion);
-    await logAction(session.user.id, session.user.name ?? "", `definiu campeão oficial: ${champion}`);
+    await logAction(session.user.id, session.user.name ?? "", `definiu campeão oficial: ${champion}`, getIp(req));
   }
 
   if (topScorer !== undefined && topScorer !== "") {
@@ -65,7 +65,7 @@ export async function PUT(req: Request) {
       update: { value: topScorer },
     });
     await recalculateSpecialScores("TOP_SCORER", topScorer);
-    await logAction(session.user.id, session.user.name ?? "", `definiu artilheiro oficial: ${topScorer}`);
+    await logAction(session.user.id, session.user.name ?? "", `definiu artilheiro oficial: ${topScorer}`, getIp(req));
   }
 
   return NextResponse.json({ success: true });

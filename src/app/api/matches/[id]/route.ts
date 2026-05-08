@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logAction } from "@/lib/actionLog";
+import { logAction, getIp } from "@/lib/actionLog";
 import { NextResponse } from "next/server";
 
 export async function PUT(
@@ -30,7 +30,7 @@ export async function PUT(
     },
   });
 
-  await logAction(session.user.id, session.user.name ?? "", `editou jogo ${homeTeam} × ${awayTeam}`);
+  await logAction(session.user.id, session.user.name ?? "", `editou jogo ${homeTeam} × ${awayTeam}`, getIp(req));
 
   return NextResponse.json(match);
 }
@@ -46,7 +46,7 @@ export async function DELETE(
   }
 
   const match = await prisma.match.delete({ where: { id } });
-  await logAction(session.user.id, session.user.name ?? "", `excluiu jogo ${match.homeTeam} × ${match.awayTeam}`);
+  await logAction(session.user.id, session.user.name ?? "", `excluiu jogo ${match.homeTeam} × ${match.awayTeam}`, getIp(req));
 
   return NextResponse.json({ success: true });
 }

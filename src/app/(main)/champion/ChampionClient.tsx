@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { normalizeText } from "@/lib/odds";
 import { getLockTime } from "@/lib/lockTime";
 
 interface Props {
@@ -196,7 +197,7 @@ function SpecialCard({
   savedValue?: string; officialValue?: string | null; predPoints?: number | null;
 }) {
   const isCorrect = officialValue && savedValue &&
-    savedValue.toLowerCase().trim() === officialValue.toLowerCase().trim();
+    normalizeText(savedValue) === normalizeText(officialValue);
 
   return (
     <div
@@ -283,7 +284,7 @@ function PredList({ title, preds, officialValue, currentUserId }: {
         {title}
       </div>
       {preds.map((pred: any) => {
-        const isCorrect = officialValue && pred.value.toLowerCase().trim() === officialValue.toLowerCase().trim();
+        const isCorrect = officialValue && normalizeText(pred.value) === normalizeText(officialValue);
         const isMe = pred.userId === currentUserId;
         return (
           <div

@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logAction } from "@/lib/actionLog";
+import { logAction, getIp } from "@/lib/actionLog";
 import { NextResponse } from "next/server";
 
 export async function POST(req: Request) {
@@ -29,7 +29,7 @@ export async function POST(req: Request) {
     },
   });
 
-  await logAction(session.user.id, session.user.name ?? "", `criou jogo ${homeTeam} × ${awayTeam}`);
+  await logAction(session.user.id, session.user.name ?? "", `criou jogo ${homeTeam} × ${awayTeam}`, getIp(req));
 
   return NextResponse.json(match);
 }

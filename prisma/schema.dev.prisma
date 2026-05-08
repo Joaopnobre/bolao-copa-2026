@@ -71,6 +71,7 @@ model ActionLog {
   userId    String
   userName  String
   action    String
+  ip        String?
   createdAt DateTime @default(now())
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

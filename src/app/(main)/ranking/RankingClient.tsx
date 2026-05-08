@@ -143,6 +143,54 @@ export function RankingClient({ ranking, currentUserId }: Props) {
         </div>
       )}
 
+      {/* Pote */}
+      {ranking.length >= 3 && (() => {
+        const ENTRY = 50;
+        const total = ranking.length * ENTRY;
+        const thirdPrize = ENTRY;
+        const remaining = total - thirdPrize;
+        const secondPrize = remaining * 0.20;
+        const firstPrize = remaining * 0.80;
+        const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
+        return (
+          <div style={{
+            background: "linear-gradient(135deg, var(--verde-escuro), var(--azul))",
+            borderRadius: 16,
+            padding: 20,
+            marginBottom: 24,
+            color: "white",
+          }}>
+            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
+              <div>
+                <div style={{ fontSize: 16, fontWeight: 800 }}>💰 Pote do Bolão</div>
+                <div style={{ fontSize: 12, opacity: 0.8 }}>{ranking.length} participantes × R$ {ENTRY},00</div>
+              </div>
+              <div style={{
+                background: "rgba(249,194,0,0.2)", border: "2px solid #F9C200",
+                borderRadius: 10, padding: "8px 18px", textAlign: "center",
+              }}>
+                <div style={{ fontSize: 10, color: "#F9C200", fontWeight: 600 }}>TOTAL</div>
+                <div style={{ fontSize: 22, fontWeight: 900, color: "#F9C200" }}>{fmt(total)}</div>
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
+              {[
+                { medal: "🥇", label: `1º — ${ranking[0].name}`, prize: firstPrize, pct: "80% do restante", color: "#F9C200" },
+                { medal: "🥈", label: `2º — ${ranking[1].name}`, prize: secondPrize, pct: "20% do restante", color: "#e2e8f0" },
+                { medal: "🥉", label: `3º — ${ranking[2].name}`, prize: thirdPrize, pct: "prêmio fixo", color: "#e8a87c" },
+              ].map((p) => (
+                <div key={p.medal} style={{ background: "rgba(255,255,255,0.1)", borderRadius: 10, padding: "12px 10px", textAlign: "center" }}>
+                  <div style={{ fontSize: 22 }}>{p.medal}</div>
+                  <div style={{ fontSize: 18, fontWeight: 900, color: p.color }}>{fmt(p.prize)}</div>
+                  <div style={{ fontSize: 11, opacity: 0.8, marginTop: 2 }}>{p.label.split("—")[1]?.trim()}</div>
+                  <div style={{ fontSize: 10, opacity: 0.6 }}>{p.pct}</div>
+                </div>
+              ))}
+            </div>
+          </div>
+        );
+      })()}
+
       {/* Full table */}
       <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 16, overflow: "hidden" }}>
         {/* Header */}

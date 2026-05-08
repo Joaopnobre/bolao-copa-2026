@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logAction } from "@/lib/actionLog";
+import { logAction, getIp } from "@/lib/actionLog";
 import { isMatchLocked } from "@/lib/lockTime";
 import { NextResponse } from "next/server";
 
@@ -31,7 +31,7 @@ export async function DELETE(
   }
 
   await prisma.prediction.delete({ where: { id } });
-  await logAction(session.user.id, session.user.name ?? "", `excluiu palpite do jogo ${prediction.match.homeTeam} × ${prediction.match.awayTeam}`);
+  await logAction(session.user.id, session.user.name ?? "", `excluiu palpite do jogo ${prediction.match.homeTeam} × ${prediction.match.awayTeam}`, getIp(req));
 
   return NextResponse.json({ success: true });
 }

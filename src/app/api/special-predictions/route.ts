@@ -1,7 +1,7 @@
 import { getServerSession } from "next-auth";
 import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
-import { logAction } from "@/lib/actionLog";
+import { logAction, getIp } from "@/lib/actionLog";
 import { isSpecialLocked } from "@/lib/lockTime";
 import { NextResponse } from "next/server";
 
@@ -24,7 +24,7 @@ export async function POST(req: Request) {
     update: { value: value.trim() },
   });
 
-  await logAction(session.user.id, session.user.name ?? "", `atualizou palpite de ${type === "CHAMPION" ? "campeão" : "artilheiro"}: ${value.trim()}`);
+  await logAction(session.user.id, session.user.name ?? "", `atualizou palpite de ${type === "CHAMPION" ? "campeão" : "artilheiro"}: ${value.trim()}`, getIp(req));
 
   return NextResponse.json(pred);
 }

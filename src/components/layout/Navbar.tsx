@@ -31,9 +31,10 @@ export function Navbar() {
   return (
     <nav
       style={{
-        background: "rgba(15,22,41,0.95)",
+        background: "rgba(255,255,255,0.95)",
         borderBottom: "1px solid var(--border-color)",
-        backdropFilter: "blur(10px)",
+        backdropFilter: "blur(12px)",
+        boxShadow: "0 1px 8px rgba(0,0,0,0.08)",
         position: "sticky",
         top: 0,
         zIndex: 50,
@@ -58,7 +59,7 @@ export function Navbar() {
                 style={{
                   fontSize: 14,
                   fontWeight: 800,
-                  background: "linear-gradient(135deg, #f5a623, #ffd700)",
+                  background: "linear-gradient(135deg, #f59e0b, #d97706)",
                   WebkitBackgroundClip: "text",
                   WebkitTextFillColor: "transparent",
                   lineHeight: 1.1,
@@ -97,9 +98,9 @@ export function Navbar() {
                     textDecoration: "none",
                     fontSize: 13,
                     fontWeight: 500,
-                    color: active ? "var(--text-primary)" : "var(--text-secondary)",
-                    background: active ? "var(--bg-card)" : "transparent",
-                    border: active ? "1px solid var(--border-highlight)" : "1px solid transparent",
+                    color: active ? "#2563eb" : "var(--text-secondary)",
+                    background: active ? "#dbeafe" : "transparent",
+                    border: active ? "1px solid #93c5fd" : "1px solid transparent",
                     transition: "all 0.2s",
                     whiteSpace: "nowrap",
                   }}
@@ -146,7 +147,7 @@ export function Navbar() {
                   {session.user.name}
                 </div>
                 {isAdmin && (
-                  <div style={{ fontSize: 10, color: "#f5a623", fontWeight: 600 }}>ADMIN</div>
+                  <div style={{ fontSize: 10, color: "#d97706", fontWeight: 700 }}>ADMIN</div>
                 )}
               </div>
             </div>
@@ -154,8 +155,8 @@ export function Navbar() {
             <button
               onClick={() => signOut({ callbackUrl: "/login" })}
               style={{
-                background: "rgba(239,68,68,0.1)",
-                border: "1px solid rgba(239,68,68,0.3)",
+                background: "#fef2f2",
+                border: "1px solid #fca5a5",
                 color: "#f87171",
                 borderRadius: 8,
                 padding: "6px 12px",

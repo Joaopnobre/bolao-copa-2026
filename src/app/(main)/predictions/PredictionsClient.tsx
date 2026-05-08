@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { MatchCard } from "@/components/ui/MatchCard";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { isMatchLocked } from "@/lib/lockTime";
+import { calculateOdd, ODDS_CONFIG } from "@/lib/odds";
 
 interface Props {
   matches: any[];
@@ -14,8 +15,52 @@ interface Props {
 export function PredictionsClient({ matches, userPredictions }: Props) {
   const router = useRouter();
   const [filter, setFilter] = useState<"all" | "pending" | "done">("all");
+  const [bulkOdds, setBulkOdds] = useState<Record<string, { counts: Record<string, number>; total: number }>>({});
 
   const predMap = new Map(userPredictions.map((p) => [p.matchId, p]));
+
+  // IDs dos jogos abertos com palpite do usuário — são os que precisam de odds
+  const openMatchIds = matches
+    .filter((m) => !isMatchLocked(new Date(m.matchDate)) && m.status !== "FINISHED")
+    .map((m) => m.id);
+
+  useEffect(() => {
+    if (!openMatchIds.length) return;
+    const fetchOdds = () => {
+      fetch(`/api/predictions/odds/bulk?matchIds=${openMatchIds.join(",")}`)
+        .then((r) => r.json())
+        .then((d) => setBulkOdds(d))
+        .catch(() => {});
+    };
+    fetchOdds();
+    const interval = setInterval(fetchOdds, 10000); // atualiza a cada 10s
+    return () => clearInterval(interval);
+  }, [openMatchIds.join(",")]);
+
+  // Calcula pontuação esperada para o palpite do usuário em um jogo
+  function getExpectedPts(matchId: string, pred: { homeScore: number; awayScore: number } | undefined) {
+    if (!pred) return null;
+    const oddData = bulkOdds[matchId];
+    if (!oddData) return null;
+    const N = Math.max(oddData.total, 1);
+
+    // Placar exato
+    const key = `${pred.homeScore}-${pred.awayScore}`;
+    const kExact = Math.max(oddData.counts[key] ?? 1, 1);
+    const exact = ODDS_CONFIG.POINTS.EXACT_SCORE * calculateOdd(kExact, N);
+
+    // Vencedor/empate
+    const predW = pred.homeScore > pred.awayScore ? "home" : pred.awayScore > pred.homeScore ? "away" : "draw";
+    let kWinner = 0;
+    for (const [sc, cnt] of Object.entries(oddData.counts)) {
+      const [sh, sa] = sc.split("-").map(Number);
+      const w = sh > sa ? "home" : sa > sh ? "away" : "draw";
+      if (w === predW) kWinner += cnt;
+    }
+    const winner = ODDS_CONFIG.POINTS.WINNER * calculateOdd(Math.max(kWinner, 1), N);
+
+    return { exact, winner };
+  }
 
   const openMatches = matches.filter((m) => !isMatchLocked(new Date(m.matchDate)) && m.status !== "FINISHED");
   const pendingMatches = openMatches.filter((m) => !predMap.has(m.id));
@@ -101,15 +146,19 @@ export function PredictionsClient({ matches, userPredictions }: Props) {
         </div>
       ) : (
         <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 10 }}>
-          {displayed.map((match) => (
-            <MatchCard
-              key={match.id}
-              match={match}
-              prediction={predMap.get(match.id) ?? null}
-              showPrediction
-              onClick={() => router.push(`/predictions/${match.id}`)}
-            />
-          ))}
+          {displayed.map((match) => {
+            const pred = predMap.get(match.id);
+            return (
+              <MatchCard
+                key={match.id}
+                match={match}
+                prediction={pred ?? null}
+                expectedPts={getExpectedPts(match.id, pred)}
+                showPrediction
+                onClick={() => router.push(`/predictions/${match.id}`)}
+              />
+            );
+          })}
         </div>
       )}
 

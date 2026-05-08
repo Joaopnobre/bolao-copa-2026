@@ -49,7 +49,7 @@ export function PredictionFormClient({ match, prediction, allPredictions, userId
         .catch(() => {});
     };
     fetchOdds();
-    const interval = setInterval(fetchOdds, 20000);
+    const interval = setInterval(fetchOdds, 10000); // atualiza a cada 10s
     return () => clearInterval(interval);
   }, [match.id, isLocked, finished]);
 

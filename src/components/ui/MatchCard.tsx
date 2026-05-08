@@ -22,6 +22,7 @@ interface MatchCardProps {
   };
   prediction?: Prediction | null;
   points?: number | null;
+  expectedPts?: { exact: number; winner: number } | null;
   showPrediction?: boolean;
   onClick?: () => void;
   compact?: boolean;
@@ -56,6 +57,7 @@ export function MatchCard({
   match,
   prediction,
   points,
+  expectedPts,
   showPrediction = true,
   onClick,
   compact = false,
@@ -158,25 +160,52 @@ export function MatchCard({
       {showPrediction && (
         <div style={{ marginTop: 10, paddingTop: 8, borderTop: "1px solid var(--border-color)" }}>
           {prediction ? (
-            <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
-              <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
-                Seu palpite:{" "}
-                <span style={{ fontWeight: 700, color: "var(--text-primary)" }}>
-                  {prediction.homeScore} – {prediction.awayScore}
-                </span>
+            <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+              {/* Linha do palpite + pontos reais (após resultado) */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+                  Seu palpite:{" "}
+                  <span style={{ fontWeight: 700, color: "var(--text-primary)" }}>
+                    {prediction.homeScore} – {prediction.awayScore}
+                  </span>
+                </div>
+                {points !== null && points !== undefined && (
+                  <span style={{
+                    fontSize: 12, fontWeight: 800,
+                    color: predResult === "exact" ? "#d97706" : predResult === "winner" ? "#009C3B" : "var(--text-secondary)",
+                  }}>
+                    {points > 0 ? `+${points.toFixed(1)} pts` : "0 pts"}
+                  </span>
+                )}
               </div>
-              {points !== null && points !== undefined && (
-                <span style={{
-                  fontSize: 12,
-                  fontWeight: 800,
-                  color: predResult === "exact" ? "#ffd700" : predResult === "winner" ? "#00d4aa" : "var(--text-secondary)",
+
+              {/* Pontuação esperada com odds (só antes do resultado) */}
+              {!finished && !locked && expectedPts && (
+                <div style={{
+                  display: "flex",
+                  gap: 6,
+                  background: "var(--bg-secondary)",
+                  borderRadius: 8,
+                  padding: "6px 10px",
                 }}>
-                  {points > 0 ? `+${points.toFixed(1)} pts` : "0 pts"}
-                </span>
+                  <div style={{ flex: 1, textAlign: "center" }}>
+                    <div style={{ fontSize: 10, color: "var(--text-secondary)", marginBottom: 1 }}>🎯 Se exato</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#009C3B" }}>
+                      {expectedPts.exact.toFixed(1)} pts
+                    </div>
+                  </div>
+                  <div style={{ width: 1, background: "var(--border-color)" }} />
+                  <div style={{ flex: 1, textAlign: "center" }}>
+                    <div style={{ fontSize: 10, color: "var(--text-secondary)", marginBottom: 1 }}>✅ Se resultado</div>
+                    <div style={{ fontSize: 14, fontWeight: 800, color: "#d97706" }}>
+                      {expectedPts.winner.toFixed(1)} pts
+                    </div>
+                  </div>
+                </div>
               )}
             </div>
           ) : !locked && !finished ? (
-            <div style={{ textAlign: "center", fontSize: 12, color: "#60a5fa", fontWeight: 600 }}>
+            <div style={{ textAlign: "center", fontSize: 12, color: "var(--azul-light)", fontWeight: 600 }}>
               Toque para palpitar →
             </div>
           ) : (

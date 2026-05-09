@@ -32,10 +32,11 @@ export function ChampionClient({
   isViewer = false,
 }: Props) {
   const router = useRouter();
-  const [champion, setChampion] = useState(championPred?.value ?? "");
-  const [scorer, setScorer]     = useState(scorerPred?.value ?? "");
-  const [loading, setLoading]   = useState(false);
-  const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [champion, setChampion]   = useState(championPred?.value ?? "");
+  const [scorer, setScorer]       = useState(scorerPred?.value ?? "");
+  const [loading, setLoading]     = useState(false);
+  const [deleting, setDeleting]   = useState<"CHAMPION" | "TOP_SCORER" | null>(null);
+  const [feedback, setFeedback]   = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const [oddsData, setOddsData] = useState<{
     counts: { CHAMPION: Record<string, number>; TOP_SCORER: Record<string, number> };
     total: number;
@@ -112,6 +113,26 @@ export function ChampionClient({
     }
   }
 
+  async function handleDelete(type: "CHAMPION" | "TOP_SCORER") {
+    if (!confirm(`Excluir palpite de ${type === "CHAMPION" ? "campeão" : "artilheiro"}?`)) return;
+    setDeleting(type);
+    try {
+      const res = await fetch("/api/special-predictions", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type }),
+      });
+      if (!res.ok) throw new Error("Erro ao excluir");
+      if (type === "CHAMPION") setChampion("");
+      else setScorer("");
+      router.refresh();
+    } catch {
+      setFeedback({ type: "error", msg: "Erro ao excluir palpite." });
+    } finally {
+      setDeleting(null);
+    }
+  }
+
   return (
     <div style={{ maxWidth: 720, margin: "0 auto" }}>
       <PageHeader
@@ -169,6 +190,8 @@ export function ChampionClient({
           savedCount={championPred?.value && oddsData
             ? (oddsData.counts.CHAMPION[normalizeText(championPred.value)] ?? 0)
             : null}
+          onDelete={championPred ? () => handleDelete("CHAMPION") : undefined}
+          isDeleting={deleting === "CHAMPION"}
         />
 
         {/* Top scorer */}
@@ -189,6 +212,8 @@ export function ChampionClient({
           savedCount={scorerPred?.value && oddsData
             ? (oddsData.counts.TOP_SCORER[normalizeText(scorerPred.value)] ?? 0)
             : null}
+          onDelete={scorerPred ? () => handleDelete("TOP_SCORER") : undefined}
+          isDeleting={deleting === "TOP_SCORER"}
         />
       </div>
 
@@ -245,7 +270,7 @@ export function ChampionClient({
 
 function SpecialCard({
   icon, title, description, points, locked, value, onChange,
-  savedValue, officialValue, predPoints, isViewer, currentOdds, oddColor, savedCount,
+  savedValue, officialValue, predPoints, isViewer, currentOdds, oddColor, savedCount, onDelete, isDeleting,
 }: {
   icon: string; title: string; description: string; points: number;
   locked: boolean; value: string; onChange: (v: string) => void;
@@ -254,6 +279,8 @@ function SpecialCard({
   currentOdds?: { odd: number; pts: number; k: number } | null;
   oddColor?: (odd: number) => string;
   savedCount?: number | null;
+  onDelete?: () => void;
+  isDeleting?: boolean;
 }) {
   const isCorrect = officialValue && savedValue &&
     normalizeText(savedValue) === normalizeText(officialValue);
@@ -330,18 +357,42 @@ function SpecialCard({
           <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>
             Seu Palpite
           </div>
-          <div
-            style={{
-              padding: "10px 14px",
-              background: "var(--bg-secondary)",
-              borderRadius: 8,
-              border: "1px solid var(--border-color)",
-              fontSize: 16,
-              fontWeight: 700,
-              color: savedValue ? "var(--text-primary)" : "var(--text-secondary)",
-            }}
-          >
-            {savedValue || <span style={{ fontSize: 13 }}>Sem palpite registrado</span>}
+          <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+            <div
+              style={{
+                flex: 1,
+                padding: "10px 14px",
+                background: "var(--bg-secondary)",
+                borderRadius: 8,
+                border: "1px solid var(--border-color)",
+                fontSize: 16,
+                fontWeight: 700,
+                color: savedValue ? "var(--text-primary)" : "var(--text-secondary)",
+              }}
+            >
+              {savedValue || <span style={{ fontSize: 13 }}>Sem palpite registrado</span>}
+            </div>
+            {!locked && !isViewer && onDelete && savedValue && (
+              <button
+                onClick={onDelete}
+                disabled={isDeleting}
+                title="Excluir palpite"
+                style={{
+                  background: "linear-gradient(135deg, #f87171, #dc2626)",
+                  border: "none",
+                  borderRadius: 8,
+                  padding: "10px 12px",
+                  cursor: isDeleting ? "not-allowed" : "pointer",
+                  fontSize: 16,
+                  color: "white",
+                  opacity: isDeleting ? 0.6 : 1,
+                  flexShrink: 0,
+                  boxShadow: "0 2px 8px rgba(220,38,38,0.3)",
+                }}
+              >
+                {isDeleting ? "..." : "🗑️"}
+              </button>
+            )}
           </div>
           {/* Mensagem de quantas pessoas escolheram o mesmo */}
           {savedValue && savedCount !== null && savedCount !== undefined && !isCorrect && (

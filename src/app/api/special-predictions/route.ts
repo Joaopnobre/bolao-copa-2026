@@ -28,3 +28,26 @@ export async function POST(req: Request) {
 
   return NextResponse.json(pred);
 }
+
+export async function DELETE(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+  const { type } = await req.json();
+  if (!["CHAMPION", "TOP_SCORER"].includes(type)) {
+    return NextResponse.json({ error: "Tipo inválido" }, { status: 400 });
+  }
+
+  const firstMatch = await prisma.match.findFirst({ orderBy: { matchDate: "asc" } });
+  if (isSpecialLocked(firstMatch?.matchDate ?? null)) {
+    return NextResponse.json({ error: "Palpites especiais bloqueados" }, { status: 403 });
+  }
+
+  await prisma.specialPrediction.deleteMany({
+    where: { userId: session.user.id, type },
+  });
+
+  await logAction(session.user.id, session.user.name ?? "", `excluiu palpite de ${type === "CHAMPION" ? "campeão" : "artilheiro"}`, getIp(req));
+
+  return NextResponse.json({ success: true });
+}

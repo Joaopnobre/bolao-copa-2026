@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
-import { normalizeText } from "@/lib/odds";
+import { normalizeText, calculateOdd, ODDS_CONFIG } from "@/lib/odds";
 import { getLockTime } from "@/lib/lockTime";
 
 interface Props {
@@ -33,11 +33,51 @@ export function ChampionClient({
 }: Props) {
   const router = useRouter();
   const [champion, setChampion] = useState(championPred?.value ?? "");
-  const [scorer, setScorer] = useState(scorerPred?.value ?? "");
-  const [loading, setLoading] = useState(false);
+  const [scorer, setScorer]     = useState(scorerPred?.value ?? "");
+  const [loading, setLoading]   = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
+  const [oddsData, setOddsData] = useState<{
+    counts: { CHAMPION: Record<string, number>; TOP_SCORER: Record<string, number> };
+    total: number;
+  } | null>(null);
 
   const lockDate = lockTime ? getLockTime(new Date(lockTime)) : null;
+
+  // Busca odds a cada 10s enquanto palpites estão abertos
+  useEffect(() => {
+    if (locked || isViewer) return;
+    const fetch10 = () =>
+      fetch("/api/special-predictions/odds")
+        .then((r) => r.json())
+        .then((d) => setOddsData(d))
+        .catch(() => {});
+    fetch10();
+    const id = setInterval(fetch10, 10000);
+    return () => clearInterval(id);
+  }, [locked, isViewer]);
+
+  // Calcula odds e pontos para um valor digitado
+  function calcSpecialOdds(value: string, type: "CHAMPION" | "TOP_SCORER") {
+    if (!oddsData || !value.trim()) return null;
+    const N   = Math.max(oddsData.total, 1);
+    const key = normalizeText(value);
+    const alreadySaved = type === "CHAMPION"
+      ? normalizeText(championPred?.value ?? "") === key
+      : normalizeText(scorerPred?.value ?? "") === key;
+    const k   = (oddsData.counts[type][key] ?? 0) + (alreadySaved ? 0 : 1);
+    const odd = calculateOdd(Math.max(k, 1), N);
+    const pts = ODDS_CONFIG.POINTS.CHAMPION * odd; // 15 pts base
+    return { odd, pts, k };
+  }
+
+  const champOdds  = calcSpecialOdds(champion, "CHAMPION");
+  const scorerOdds = calcSpecialOdds(scorer, "TOP_SCORER");
+
+  function oddColor(odd: number) {
+    if (odd >= 0.85) return "#009C3B";
+    if (odd >= 0.65) return "#d97706";
+    return "#dc2626";
+  }
 
   async function handleSave() {
     setLoading(true);
@@ -124,6 +164,8 @@ export function ChampionClient({
           savedValue={championPred?.value}
           officialValue={officialChampion}
           predPoints={championPred?.points}
+          currentOdds={champOdds}
+          oddColor={oddColor}
         />
 
         {/* Top scorer */}
@@ -139,6 +181,8 @@ export function ChampionClient({
           savedValue={scorerPred?.value}
           officialValue={officialScorer}
           predPoints={scorerPred?.points}
+          currentOdds={scorerOdds}
+          oddColor={oddColor}
         />
       </div>
 
@@ -194,14 +238,20 @@ export function ChampionClient({
 }
 
 function SpecialCard({
-  icon, title, description, points, locked, value, onChange, savedValue, officialValue, predPoints, isViewer,
+  icon, title, description, points, locked, value, onChange,
+  savedValue, officialValue, predPoints, isViewer, currentOdds, oddColor,
 }: {
   icon: string; title: string; description: string; points: number;
   locked: boolean; value: string; onChange: (v: string) => void;
-  savedValue?: string; officialValue?: string | null; predPoints?: number | null; isViewer?: boolean;
+  savedValue?: string; officialValue?: string | null; predPoints?: number | null;
+  isViewer?: boolean;
+  currentOdds?: { odd: number; pts: number; k: number } | null;
+  oddColor?: (odd: number) => string;
 }) {
   const isCorrect = officialValue && savedValue &&
     normalizeText(savedValue) === normalizeText(officialValue);
+
+  const color = oddColor ?? (() => "#009C3B");
 
   return (
     <div
@@ -223,28 +273,51 @@ function SpecialCard({
         </div>
       </div>
 
-      <div
-        style={{
-          background: "rgba(245,166,35,0.1)",
-          border: "1px solid rgba(245,166,35,0.2)",
-          borderRadius: 8,
-          padding: "6px 12px",
-          fontSize: 12,
-          color: "#f5a623",
-          fontWeight: 600,
-        }}
-      >
+      <div style={{
+        background: "rgba(245,166,35,0.1)", border: "1px solid rgba(245,166,35,0.2)",
+        borderRadius: 8, padding: "6px 12px", fontSize: 12, color: "#f5a623", fontWeight: 600,
+      }}>
         Vale até {points} pontos (mínimo {points / 2} pts com odds)
       </div>
 
       {!locked && !isViewer ? (
-        <input
-          className="input-field"
-          type="text"
-          value={value}
-          onChange={(e) => onChange(e.target.value)}
-          placeholder={icon === "👑" ? "Ex: Brasil, Argentina, França..." : "Ex: Lionel Messi, Kylian Mbappé..."}
-        />
+        <>
+          <input
+            className="input-field"
+            type="text"
+            value={value}
+            onChange={(e) => onChange(e.target.value)}
+            placeholder={icon === "👑" ? "Ex: Brasil, Argentina, França..." : "Ex: Lionel Messi, Kylian Mbappé..."}
+          />
+
+          {/* Odds em tempo real */}
+          {currentOdds && value.trim() ? (
+            <div style={{
+              background: currentOdds.odd >= 0.85 ? "linear-gradient(135deg, #f0fdf4, #dcfce7)"
+                : currentOdds.odd >= 0.65 ? "linear-gradient(135deg, #fffbeb, #fef3c7)"
+                : "linear-gradient(135deg, #fef2f2, #fee2e2)",
+              border: `2px solid ${color(currentOdds.odd)}`,
+              borderRadius: 10,
+              padding: "10px 14px",
+              textAlign: "center",
+            }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: color(currentOdds.odd), marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                Se acertar
+              </div>
+              <div style={{ fontSize: 26, fontWeight: 900, color: color(currentOdds.odd), lineHeight: 1 }}>
+                {currentOdds.pts.toFixed(1)}
+                <span style={{ fontSize: 13, fontWeight: 600, marginLeft: 3 }}>pts</span>
+              </div>
+              <div style={{ fontSize: 10, color: "#64748b", marginTop: 4 }}>
+                odd {(currentOdds.odd * 100).toFixed(0)}% · {currentOdds.k} pessoa{currentOdds.k !== 1 ? "s" : ""} com essa escolha
+              </div>
+            </div>
+          ) : value.trim() ? (
+            <div style={{ fontSize: 12, color: "var(--text-secondary)", textAlign: "center" }}>
+              Calculando odds...
+            </div>
+          ) : null}
+        </>
       ) : (
         <div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5, fontWeight: 600 }}>

@@ -50,15 +50,21 @@ export function calculateMatchPoints(
   return { points: 0, type: "none" };
 }
 
-// Normaliza texto para comparação: remove acentos, minúsculas, trim
-// "Vinícius Jr.", "vinicius jr", "VINICIUS JR" → "vinicius jr"
+// Normaliza texto para comparação: remove acentos, minúsculas, trim e aliases comuns.
+// Exemplos equivalentes após normalização:
+//   "Vinícius Júnior" = "Vinicius Jr" = "vinicius jr." → "vinicius jr"
+//   "São Paulo" = "Sao Paulo" → "sao paulo"
 export function normalizeText(text: string): string {
   return text
     .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
+    .replace(/[̀-ͯ]/g, "")   // remove diacríticos
     .toLowerCase()
     .trim()
-    .replace(/\s+/g, " ");
+    .replace(/\./g, "")                // remove pontos ("jr." → "jr")
+    .replace(/\s+/g, " ")             // espaços múltiplos → um
+    .replace(/\bjunior\b/g, "jr")     // "junior" → "jr"
+    .replace(/\bsaint\b/g, "st")      // "saint" → "st"
+    .trim();
 }
 
 export function calculateSpecialPoints(

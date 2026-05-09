@@ -43,9 +43,9 @@ export function ChampionClient({
 
   const lockDate = lockTime ? getLockTime(new Date(lockTime)) : null;
 
-  // Busca odds a cada 10s enquanto palpites estão abertos
+  // Busca odds a cada 10s — sempre, para mostrar contagens mesmo após salvar
   useEffect(() => {
-    if (locked || isViewer) return;
+    if (isViewer) return;
     const fetch10 = () =>
       fetch("/api/special-predictions/odds")
         .then((r) => r.json())
@@ -54,7 +54,7 @@ export function ChampionClient({
     fetch10();
     const id = setInterval(fetch10, 10000);
     return () => clearInterval(id);
-  }, [locked, isViewer]);
+  }, [isViewer]);
 
   // Calcula odds e pontos para um valor digitado
   function calcSpecialOdds(value: string, type: "CHAMPION" | "TOP_SCORER") {
@@ -166,6 +166,9 @@ export function ChampionClient({
           predPoints={championPred?.points}
           currentOdds={champOdds}
           oddColor={oddColor}
+          savedCount={championPred?.value && oddsData
+            ? (oddsData.counts.CHAMPION[normalizeText(championPred.value)] ?? 0)
+            : null}
         />
 
         {/* Top scorer */}
@@ -183,6 +186,9 @@ export function ChampionClient({
           predPoints={scorerPred?.points}
           currentOdds={scorerOdds}
           oddColor={oddColor}
+          savedCount={scorerPred?.value && oddsData
+            ? (oddsData.counts.TOP_SCORER[normalizeText(scorerPred.value)] ?? 0)
+            : null}
         />
       </div>
 
@@ -239,7 +245,7 @@ export function ChampionClient({
 
 function SpecialCard({
   icon, title, description, points, locked, value, onChange,
-  savedValue, officialValue, predPoints, isViewer, currentOdds, oddColor,
+  savedValue, officialValue, predPoints, isViewer, currentOdds, oddColor, savedCount,
 }: {
   icon: string; title: string; description: string; points: number;
   locked: boolean; value: string; onChange: (v: string) => void;
@@ -247,6 +253,7 @@ function SpecialCard({
   isViewer?: boolean;
   currentOdds?: { odd: number; pts: number; k: number } | null;
   oddColor?: (odd: number) => string;
+  savedCount?: number | null;
 }) {
   const isCorrect = officialValue && savedValue &&
     normalizeText(savedValue) === normalizeText(officialValue);
@@ -336,6 +343,31 @@ function SpecialCard({
           >
             {savedValue || <span style={{ fontSize: 13 }}>Sem palpite registrado</span>}
           </div>
+          {/* Mensagem de quantas pessoas escolheram o mesmo */}
+          {savedValue && savedCount !== null && savedCount !== undefined && !isCorrect && (
+            <div style={{
+              marginTop: 8,
+              padding: "6px 10px",
+              borderRadius: 8,
+              textAlign: "center",
+              fontSize: 12,
+              fontWeight: 600,
+              background: savedCount === 1
+                ? "linear-gradient(135deg, #f0fdf4, #dcfce7)"
+                : savedCount <= 3
+                ? "linear-gradient(135deg, #fffbeb, #fef3c7)"
+                : "linear-gradient(135deg, #fef2f2, #fee2e2)",
+              color: savedCount === 1 ? "#009C3B" : savedCount <= 3 ? "#d97706" : "#dc2626",
+              border: `1px solid ${savedCount === 1 ? "#86efac" : savedCount <= 3 ? "#fcd34d" : "#fca5a5"}`,
+            }}>
+              {savedCount === 1
+                ? "🎯 Só você escolheu isso!"
+                : savedCount === 2
+                ? "🤝 1 pessoa escolheu o mesmo que você"
+                : `👥 ${savedCount - 1} pessoas escolheram o mesmo que você!`}
+            </div>
+          )}
+
           {isCorrect && (
             <div style={{ marginTop: 8, fontSize: 13, fontWeight: 700, color: "#ffd700", textAlign: "center" }}>
               🎯 Acertou! {predPoints !== null && predPoints !== undefined ? `+${predPoints.toFixed(1)} pts` : ""}

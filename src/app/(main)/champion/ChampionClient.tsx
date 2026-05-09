@@ -1,10 +1,24 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { normalizeText, calculateOdd, ODDS_CONFIG } from "@/lib/odds";
 import { getLockTime } from "@/lib/lockTime";
+
+// Lista completa das 48 seleções da Copa do Mundo 2026
+const COPA_COUNTRIES = [
+  "África do Sul","Alemanha","Argélia","Argentina","Arábia Saudita",
+  "Austrália","Áustria","Bélgica","Bósnia","Brasil",
+  "Cabo Verde","Canadá","Catar","Colômbia","Congo",
+  "Coreia do Sul","Costa do Marfim","Croácia","Curaçao","Egito",
+  "Equador","Escócia","Espanha","Estados Unidos","França",
+  "Gana","Haiti","Holanda","Inglaterra","Iraque",
+  "Irã","Japão","Jordânia","Marrocos","México",
+  "Nova Zelândia","Noruega","Panamá","Paraguai","Portugal",
+  "República Tcheca","Senegal","Suécia","Suíça","Turquia",
+  "Tunísia","Uruguai","Uzbequistão",
+];
 
 interface Props {
   championPred: any;
@@ -192,6 +206,7 @@ export function ChampionClient({
             : null}
           onDelete={championPred ? () => handleDelete("CHAMPION") : undefined}
           isDeleting={deleting === "CHAMPION"}
+          suggestions={COPA_COUNTRIES}
         />
 
         {/* Top scorer */}
@@ -214,6 +229,10 @@ export function ChampionClient({
             : null}
           onDelete={scorerPred ? () => handleDelete("TOP_SCORER") : undefined}
           isDeleting={deleting === "TOP_SCORER"}
+          suggestions={oddsData
+            ? Object.keys(oddsData.counts.TOP_SCORER)
+                .sort((a, b) => oddsData.counts.TOP_SCORER[b] - oddsData.counts.TOP_SCORER[a])
+            : []}
         />
       </div>
 
@@ -270,7 +289,7 @@ export function ChampionClient({
 
 function SpecialCard({
   icon, title, description, points, locked, value, onChange,
-  savedValue, officialValue, predPoints, isViewer, currentOdds, oddColor, savedCount, onDelete, isDeleting,
+  savedValue, officialValue, predPoints, isViewer, currentOdds, oddColor, savedCount, onDelete, isDeleting, suggestions = [],
 }: {
   icon: string; title: string; description: string; points: number;
   locked: boolean; value: string; onChange: (v: string) => void;
@@ -281,11 +300,35 @@ function SpecialCard({
   savedCount?: number | null;
   onDelete?: () => void;
   isDeleting?: boolean;
+  suggestions?: string[];
 }) {
   const isCorrect = officialValue && savedValue &&
     normalizeText(savedValue) === normalizeText(officialValue);
 
   const color = oddColor ?? (() => "#009C3B");
+
+  // Autocomplete
+  const [focused, setFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const filtered = value.trim().length >= 1
+    ? suggestions
+        .filter((s) => normalizeText(s).includes(normalizeText(value)))
+        .sort((a, b) => {
+          // Prioriza quem começa com o texto digitado
+          const aNorm = normalizeText(a), bNorm = normalizeText(b), q = normalizeText(value);
+          return (bNorm.startsWith(q) ? 1 : 0) - (aNorm.startsWith(q) ? 1 : 0);
+        })
+        .slice(0, 6)
+    : [];
+
+  const showDropdown = focused && filtered.length > 0 && normalizeText(value) !== normalizeText(filtered[0]);
+
+  function pick(s: string) {
+    onChange(s);
+    setFocused(false);
+    inputRef.current?.blur();
+  }
 
   return (
     <div
@@ -316,13 +359,62 @@ function SpecialCard({
 
       {!locked && !isViewer ? (
         <>
-          <input
-            className="input-field"
-            type="text"
-            value={value}
-            onChange={(e) => onChange(e.target.value)}
-            placeholder={icon === "👑" ? "Ex: Brasil, Argentina, França..." : "Ex: Lionel Messi, Kylian Mbappé..."}
-          />
+          <div style={{ position: "relative" }}>
+            <input
+              ref={inputRef}
+              className="input-field"
+              type="text"
+              value={value}
+              onChange={(e) => onChange(e.target.value)}
+              onFocus={() => setFocused(true)}
+              onBlur={() => setTimeout(() => setFocused(false), 150)}
+              placeholder={icon === "👑" ? "Ex: Brasil, Argentina, França..." : "Ex: Lionel Messi, Kylian Mbappé..."}
+            />
+
+            {/* Dropdown de sugestões */}
+            {showDropdown && (
+              <div style={{
+                position: "absolute",
+                top: "calc(100% + 4px)",
+                left: 0, right: 0,
+                background: "var(--bg-card)",
+                border: "1.5px solid var(--verde)",
+                borderRadius: 10,
+                zIndex: 50,
+                overflow: "hidden",
+                boxShadow: "0 8px 24px rgba(0,0,0,0.2)",
+              }}>
+                {filtered.map((s) => {
+                  const q = normalizeText(value);
+                  const sn = normalizeText(s);
+                  const idx = sn.indexOf(q);
+                  return (
+                    <button
+                      key={s}
+                      onMouseDown={() => pick(s)}
+                      style={{
+                        display: "block", width: "100%", textAlign: "left",
+                        padding: "10px 14px", background: "transparent",
+                        border: "none", borderBottom: "1px solid var(--border-color)",
+                        cursor: "pointer", fontSize: 14, color: "var(--text-primary)",
+                        transition: "background 0.15s",
+                      }}
+                      onMouseEnter={(e) => { (e.currentTarget as HTMLElement).style.background = "var(--verde-bg)"; }}
+                      onMouseLeave={(e) => { (e.currentTarget as HTMLElement).style.background = "transparent"; }}
+                    >
+                      {idx >= 0 ? (
+                        <>
+                          {s.slice(0, idx)}
+                          <strong style={{ color: "var(--verde)" }}>{s.slice(idx, idx + value.length)}</strong>
+                          {s.slice(idx + value.length)}
+                        </>
+                      ) : s}
+                    </button>
+                  );
+                })}
+              </div>
+            )}
+          </div>
 
           {/* Odds em tempo real */}
           {currentOdds && value.trim() ? (

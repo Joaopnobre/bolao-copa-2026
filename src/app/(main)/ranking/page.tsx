@@ -10,6 +10,7 @@ export default async function RankingPage() {
 
   const users = await prisma.user.findMany({
     where: { isActive: true, role: "PARTICIPANT" },
+    // hasPaid incluído para o cálculo do pote
     include: {
       predictions: { include: { match: { select: { homeScore: true, awayScore: true, status: true } } } },
       specialPredictions: true,
@@ -38,6 +39,7 @@ export default async function RankingPage() {
       id: user.id,
       name: user.name,
       username: user.username,
+      hasPaid: (user as any).hasPaid ?? false,
       totalPoints: matchPts + specialPts,
       matchPoints: matchPts,
       champPoints: champPts,
@@ -52,10 +54,14 @@ export default async function RankingPage() {
     return b.exactCount - a.exactCount;
   });
 
+  // Apenas participantes que pagaram contam para o pote
+  const paidCount = users.filter((u) => (u as any).hasPaid).length;
+
   return (
     <RankingClient
       ranking={ranking}
       currentUserId={session.user.id}
+      paidCount={paidCount}
     />
   );
 }

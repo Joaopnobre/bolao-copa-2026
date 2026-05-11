@@ -17,6 +17,7 @@ model User {
   password           String
   role               String              @default("PARTICIPANT")
   isActive           Boolean             @default(true)
+  hasPaid            Boolean             @default(false)
   createdAt          DateTime            @default(now())
   updatedAt          DateTime            @updatedAt
   predictions        Prediction[]

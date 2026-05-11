@@ -18,12 +18,13 @@ interface RankingEntry {
 interface Props {
   ranking: RankingEntry[];
   currentUserId: string;
+  paidCount?: number;
 }
 
 const MEDALS = ["🥇", "🥈", "🥉"];
 const RANK_COLORS = ["#ffd700", "#c0c0c0", "#cd7f32"];
 
-export function RankingClient({ ranking, currentUserId }: Props) {
+export function RankingClient({ ranking, currentUserId, paidCount }: Props) {
   if (ranking.length === 0) {
     return (
       <div>
@@ -143,12 +144,13 @@ export function RankingClient({ ranking, currentUserId }: Props) {
         </div>
       )}
 
-      {/* Pote */}
+      {/* Pote — baseado apenas em quem pagou */}
       {ranking.length >= 3 && (() => {
         const ENTRY = 50;
-        const total = ranking.length * ENTRY;
+        const paid = paidCount ?? 0;
+        const total = paid * ENTRY;
         const thirdPrize = ENTRY;
-        const remaining = total - thirdPrize;
+        const remaining = Math.max(total - thirdPrize, 0);
         const secondPrize = remaining * 0.20;
         const firstPrize = remaining * 0.80;
         const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
@@ -163,14 +165,17 @@ export function RankingClient({ ranking, currentUserId }: Props) {
             <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
               <div>
                 <div style={{ fontSize: 16, fontWeight: 800 }}>💰 Pote do Bolão</div>
-                <div style={{ fontSize: 12, opacity: 0.8 }}>{ranking.length} participantes ativos × R$ {ENTRY},00</div>
+                <div style={{ fontSize: 12, opacity: 0.8 }}>
+                  {paid} {paid === 1 ? "participante pagou" : "participantes pagaram"} × R$ {ENTRY},00
+                </div>
               </div>
               <div style={{
                 background: "rgba(249,194,0,0.2)", border: "2px solid #F9C200",
                 borderRadius: 10, padding: "8px 18px", textAlign: "center",
               }}>
-                <div style={{ fontSize: 10, color: "#F9C200", fontWeight: 600 }}>TOTAL</div>
+                <div style={{ fontSize: 10, color: "#F9C200", fontWeight: 600 }}>TOTAL PAGO</div>
                 <div style={{ fontSize: 22, fontWeight: 900, color: "#F9C200" }}>{fmt(total)}</div>
+                {paid === 0 && <div style={{ fontSize: 9, color: "rgba(255,255,255,0.5)", marginTop: 2 }}>Ninguém pagou ainda</div>}
               </div>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>

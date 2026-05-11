@@ -14,7 +14,7 @@ function renderMarkdown(content: string) {
 
   function flushTable() {
     if (!tableRows.length) return;
-    const [header, , ...body] = tableRows;
+    const [header, ...body] = tableRows;
     if (!header) return;
     elements.push(
       <div key={`table-${i}`} style={{ overflowX: "auto", marginBottom: 16 }}>
@@ -51,7 +51,8 @@ function renderMarkdown(content: string) {
 
     if (line.startsWith("|")) {
       inTable = true;
-      const cells = line.split("|").filter((_, idx) => idx !== 0 || line[0] !== "|").map(c => c.trim());
+      const rawCells = line.split("|");
+      const cells = rawCells.slice(line.startsWith("|") ? 1 : 0, line.endsWith("|") ? rawCells.length - 1 : undefined).map(c => c.trim());
       if (!line.match(/^[|\s-]+$/)) tableRows.push(cells);
       i++;
       continue;

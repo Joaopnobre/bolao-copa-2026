@@ -151,8 +151,8 @@ export function RankingClient({ ranking, currentUserId, paidCount }: Props) {
         const total = paid * ENTRY;
         const thirdPrize = ENTRY;
         const remaining = Math.max(total - thirdPrize, 0);
-        const secondPrize = remaining * 0.20;
-        const firstPrize = remaining * 0.80;
+        const secondPrize = remaining * 0.30;
+        const firstPrize = remaining * 0.70;
         const fmt = (v: number) => v.toLocaleString("pt-BR", { style: "currency", currency: "BRL" });
         return (
           <div style={{
@@ -180,9 +180,9 @@ export function RankingClient({ ranking, currentUserId, paidCount }: Props) {
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr 1fr", gap: 10 }}>
               {[
-                { medal: "🥇", label: `1º — ${ranking[0].name}`, prize: firstPrize, pct: "80% do restante", color: "#F9C200" },
-                { medal: "🥈", label: `2º — ${ranking[1].name}`, prize: secondPrize, pct: "20% do restante", color: "#e2e8f0" },
-                { medal: "🥉", label: `3º — ${ranking[2].name}`, prize: thirdPrize, pct: "prêmio fixo", color: "#e8a87c" },
+                { medal: "🥇", label: `1º — ${ranking[0].name}`, prize: firstPrize, pct: "70% do restante", color: "#F9C200" },
+                { medal: "🥈", label: `2º — ${ranking[1].name}`, prize: secondPrize, pct: "30% do restante", color: "#e2e8f0" },
+                { medal: "🥉", label: `3º — ${ranking[2].name}`, prize: thirdPrize, pct: "R$50 de volta", color: "#e8a87c" },
               ].map((p) => (
                 <div key={p.medal} style={{ background: "rgba(255,255,255,0.1)", borderRadius: 10, padding: "12px 10px", textAlign: "center" }}>
                   <div style={{ fontSize: 22 }}>{p.medal}</div>

@@ -7,7 +7,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "vercel-build": "prisma migrate deploy && next build",
+    "vercel-build": "next build",
     "db:push": "prisma db push --schema=prisma/schema.dev.prisma",
     "db:migrate:new": "prisma migrate dev",
     "db:seed": "tsx prisma/seed.ts",

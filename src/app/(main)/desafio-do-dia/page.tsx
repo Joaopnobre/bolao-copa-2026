@@ -31,25 +31,29 @@ export default async function DesafioPage() {
   });
 
   const hints = parseHints(challenge.hints);
-
-  // Build map of revealed hints by index
   const revealedIndices: number[] = JSON.parse(attempt?.revealedIndices ?? "[]");
   const revealedMap: Record<number, Hint> = {};
   revealedIndices.forEach((i) => { if (hints[i]) revealedMap[i] = hints[i]; });
 
-  const rankingAttempts = await (prisma as any).challengeAttempt.findMany({
-    where: { challengeId: challenge.id, completed: true },
+  // Cumulative ranking: sum of points across all challenges
+  const allAttempts = await (prisma as any).challengeAttempt.findMany({
+    where: { completed: true },
     include: { user: { select: { name: true, username: true } } },
-    orderBy: [{ points: "desc" }, { completedAt: "asc" }],
   });
 
-  const ranking = rankingAttempts.map((a: any, i: number) => ({
-    rank: i + 1,
-    name: a.user.name,
-    username: a.user.username,
-    points: a.points ?? 0,
-    solved: a.solved,
-  }));
+  const userMap: Record<string, { name: string; username: string; totalPoints: number; solvedCount: number; playedCount: number }> = {};
+  for (const a of allAttempts) {
+    if (!userMap[a.userId]) {
+      userMap[a.userId] = { name: a.user.name, username: a.user.username, totalPoints: 0, solvedCount: 0, playedCount: 0 };
+    }
+    userMap[a.userId].totalPoints += a.points ?? 0;
+    userMap[a.userId].playedCount += 1;
+    if (a.solved) userMap[a.userId].solvedCount += 1;
+  }
+
+  const cumulativeRanking = Object.values(userMap)
+    .sort((a, b) => b.totalPoints - a.totalPoints || b.solvedCount - a.solvedCount)
+    .map((u, i) => ({ rank: i + 1, ...u }));
 
   return (
     <DailyChallengeClient
@@ -67,7 +71,7 @@ export default async function DesafioPage() {
         guesses: attempt.guesses.map((g: any) => ({ guess: g.guess, isCorrect: g.isCorrect })),
         answer: attempt.completed ? challenge.answer : undefined,
       } : null}
-      initialRanking={ranking}
+      initialRanking={cumulativeRanking}
       currentUserUsername={session.user.username ?? ""}
     />
   );

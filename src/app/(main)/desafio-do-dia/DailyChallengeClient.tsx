@@ -12,8 +12,9 @@ interface RankingEntry {
   rank: number;
   name: string;
   username: string;
-  points: number;
-  solved: boolean;
+  totalPoints: number;
+  solvedCount: number;
+  playedCount: number;
 }
 
 interface AttemptState {
@@ -349,8 +350,11 @@ export function DailyChallengeClient({
       <div style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 16, overflow: "hidden" }}>
         <div style={{ padding: "14px 20px", borderBottom: "1px solid var(--border-color)" }}>
           <h3 style={{ margin: 0, fontSize: 15, fontWeight: 700, color: "var(--text-primary)" }}>
-            🏅 Ranking do Desafio de Hoje
+            🏅 Ranking Geral — Desafios
           </h3>
+          <div style={{ fontSize: 11, color: "var(--text-secondary)", marginTop: 2 }}>
+            Pontuação acumulada de todos os desafios
+          </div>
         </div>
         {ranking.length === 0 ? (
           <div style={{ padding: "24px", textAlign: "center", color: "var(--text-secondary)", fontSize: 13 }}>
@@ -368,15 +372,15 @@ export function DailyChallengeClient({
               </span>
               <div style={{ flex: 1 }}>
                 <div style={{ fontSize: 13, fontWeight: 600, color: "var(--text-primary)" }}>{entry.name}</div>
-                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>@{entry.username}</div>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)" }}>
+                  ✅ {entry.solvedCount} acerto{entry.solvedCount !== 1 ? "s" : ""} · 🎯 {entry.playedCount} jogado{entry.playedCount !== 1 ? "s" : ""}
+                </div>
               </div>
               <div style={{ textAlign: "right" }}>
-                <div style={{ fontSize: 16, fontWeight: 800, color: entry.solved ? "#00d4aa" : "#f87171" }}>
-                  {entry.solved ? `${entry.points} pts` : "0 pts"}
+                <div style={{ fontSize: 18, fontWeight: 900, color: "#F9C200" }}>
+                  {entry.totalPoints} pts
                 </div>
-                <div style={{ fontSize: 10, color: "var(--text-secondary)" }}>
-                  {entry.solved ? "✅ acertou" : "❌ errou"}
-                </div>
+                <div style={{ fontSize: 10, color: "var(--text-secondary)" }}>total</div>
               </div>
             </div>
           ))

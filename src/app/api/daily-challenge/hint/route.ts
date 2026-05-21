@@ -38,24 +38,25 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Dica já revelada" }, { status: 400 });
   }
 
-  const hints = parseHints(challenge.hints);
-  const hint = hints[hintIndex];
+  // Block new hints if a LOSE_TURN was already revealed
+  const existingHints = parseHints(challenge.hints);
+  const alreadyLostTurn = revealedIndices.some((i) => existingHints[i]?.type === "LOSE_TURN");
+  if (alreadyLostTurn) {
+    return NextResponse.json({ error: "Use seus palpites!" }, { status: 400 });
+  }
+
+  const hint = existingHints[hintIndex];
   if (!hint) return NextResponse.json({ error: "Dica não encontrada" }, { status: 404 });
 
   const isLoseTurn = hint.type === "LOSE_TURN";
   const newRevealedIndices = [...revealedIndices, hintIndex];
   const newCount = newRevealedIndices.length;
 
-  const updated = await (prisma as any).challengeAttempt.update({
+  await (prisma as any).challengeAttempt.update({
     where: { id: attempt.id },
     data: {
       revealedHintsCount: newCount,
       revealedIndices: JSON.stringify(newRevealedIndices),
-      ...(isLoseTurn && {
-        completed: true,
-        points: 0,
-        completedAt: new Date(),
-      }),
     },
   });
 
@@ -65,8 +66,8 @@ export async function POST(req: Request) {
     revealedHintsCount: newCount,
     revealedIndices: newRevealedIndices,
     lostTurn: isLoseTurn,
-    completed: updated.completed,
-    points: updated.points,
-    answer: isLoseTurn ? challenge.answer : null,
+    completed: false,
+    points: null,
+    answer: null,
   });
 }

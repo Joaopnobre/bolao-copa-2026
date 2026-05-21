@@ -34,6 +34,7 @@ interface Props {
   category: string;
   totalHints: number;
   initialRevealedMap: Record<number, Hint>;
+  initialLostTurn: boolean;
   initialAttempt: AttemptState | null;
   initialRanking: RankingEntry[];
   currentUserUsername: string;
@@ -44,11 +45,13 @@ export function DailyChallengeClient({
   category,
   totalHints,
   initialRevealedMap,
+  initialLostTurn,
   initialAttempt,
   initialRanking,
   currentUserUsername,
 }: Props) {
   const [revealedMap, setRevealedMap] = useState<Record<number, Hint>>(initialRevealedMap);
+  const [lostTurn, setLostTurn] = useState(initialLostTurn);
   const [attempt, setAttempt] = useState<AttemptState | null>(initialAttempt);
   const [guess, setGuess] = useState("");
   const [loading, setLoading] = useState(false);
@@ -69,7 +72,7 @@ export function DailyChallengeClient({
   }
 
   async function handleRevealHint(hintIndex: number) {
-    if (completed || revealedMap[hintIndex] !== undefined || revealingIndex !== null) return;
+    if (completed || lostTurn || revealedMap[hintIndex] !== undefined || revealingIndex !== null) return;
     setRevealingIndex(hintIndex);
     try {
       const res = await fetch("/api/daily-challenge/hint", {
@@ -81,17 +84,15 @@ export function DailyChallengeClient({
       if (!res.ok) return;
 
       setRevealedMap((prev) => ({ ...prev, [hintIndex]: data.hint }));
+      if (data.lostTurn) setLostTurn(true);
       setAttempt((prev) => ({
         ...(prev ?? { guessesUsed: 0, solved: false, guesses: [] }),
         revealedHintsCount: data.revealedHintsCount,
         revealedIndices: data.revealedIndices,
-        completed: data.completed,
-        points: data.points ?? prev?.points ?? null,
-        answer: data.answer ?? prev?.answer,
-        lostTurn: data.lostTurn || prev?.lostTurn,
+        completed: false,
+        points: prev?.points ?? null,
+        answer: prev?.answer,
       }));
-
-      if (data.lostTurn) await refreshRanking();
     } finally {
       setRevealingIndex(null);
     }
@@ -185,7 +186,7 @@ export function DailyChallengeClient({
       </div>
 
       {/* LOSE TURN */}
-      {attempt?.lostTurn && completed && (
+      {lostTurn && !completed && (
         <div style={{
           background: "linear-gradient(135deg, rgba(239,68,68,0.15), rgba(220,38,38,0.05))",
           border: "2px solid rgba(239,68,68,0.4)",
@@ -193,7 +194,20 @@ export function DailyChallengeClient({
         }}>
           <div style={{ fontSize: 40, marginBottom: 8 }}>💀</div>
           <div style={{ fontSize: 18, fontWeight: 900, color: "#f87171", marginBottom: 4 }}>PERCA SUA VEZ!</div>
-          <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>Você encontrou a dica especial. Desafio encerrado!</div>
+          <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>
+            Você não pode mais abrir dicas. Use seus palpites agora!
+          </div>
+        </div>
+      )}
+      {lostTurn && completed && !attempt?.solved && (
+        <div style={{
+          background: "linear-gradient(135deg, rgba(239,68,68,0.15), rgba(220,38,38,0.05))",
+          border: "2px solid rgba(239,68,68,0.4)",
+          borderRadius: 16, padding: "20px 24px", marginBottom: 20, textAlign: "center",
+        }}>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>💀</div>
+          <div style={{ fontSize: 18, fontWeight: 900, color: "#f87171", marginBottom: 4 }}>PERCA SUA VEZ!</div>
+          <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>Você encontrou a dica especial e não acertou. Desafio encerrado!</div>
         </div>
       )}
 
@@ -276,7 +290,7 @@ export function DailyChallengeClient({
                 borderRadius: 10,
                 padding: "10px 8px",
                 minHeight: 80,
-                cursor: revealed || completed ? "default" : "pointer",
+                cursor: revealed || completed || lostTurn ? "default" : "pointer",
                 transition: "all 0.2s",
                 display: "flex",
                 flexDirection: "column",

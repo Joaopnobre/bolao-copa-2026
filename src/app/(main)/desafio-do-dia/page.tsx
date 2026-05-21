@@ -34,6 +34,7 @@ export default async function DesafioPage() {
   const revealedIndices: number[] = JSON.parse(attempt?.revealedIndices ?? "[]");
   const revealedMap: Record<number, Hint> = {};
   revealedIndices.forEach((i) => { if (hints[i]) revealedMap[i] = hints[i]; });
+  const initialLostTurn = revealedIndices.some((i) => hints[i]?.type === "LOSE_TURN");
 
   // Cumulative ranking: sum of points across all challenges
   const allAttempts = await (prisma as any).challengeAttempt.findMany({
@@ -61,6 +62,7 @@ export default async function DesafioPage() {
       category={CATEGORY_LABELS[challenge.category] ?? challenge.category}
       totalHints={hints.length}
       initialRevealedMap={revealedMap}
+      initialLostTurn={initialLostTurn}
       initialAttempt={attempt ? {
         revealedHintsCount: attempt.revealedHintsCount,
         revealedIndices,

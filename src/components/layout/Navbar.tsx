@@ -12,6 +12,7 @@ const navItems = [
   { href: "/ranking", label: "Ranking", icon: "🏆" },
   { href: "/champion", label: "Campeão", icon: "👑" },
   { href: "/rules", label: "Regras", icon: "📋" },
+  { href: "/desafio-do-dia", label: "Desafio!", icon: "🎮" },
 ];
 
 const adminItems = [

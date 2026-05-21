@@ -3,16 +3,14 @@ import { authOptions } from "@/lib/auth";
 import { prisma } from "@/lib/prisma";
 import { redirect } from "next/navigation";
 import { DailyChallengeClient } from "./DailyChallengeClient";
-import { getTodayRange, parseHints, CATEGORY_LABELS } from "@/lib/daily-challenge";
+import { getTodayRange, parseHints, CATEGORY_LABELS, type Hint } from "@/lib/daily-challenge";
 
 export default async function DesafioPage() {
   const session = await getServerSession(authOptions);
   if (!session) redirect("/login");
 
-  const todayRange = getTodayRange();
-
   const challenge = await prisma.challenge.findFirst({
-    where: { status: "PUBLISHED", publishDate: todayRange },
+    where: { status: "PUBLISHED", publishDate: getTodayRange() },
   });
 
   if (!challenge) {
@@ -33,7 +31,11 @@ export default async function DesafioPage() {
   });
 
   const hints = parseHints(challenge.hints);
-  const revealedHints = attempt ? hints.slice(0, attempt.revealedHintsCount) : [];
+
+  // Build map of revealed hints by index
+  const revealedIndices: number[] = JSON.parse(attempt?.revealedIndices ?? "[]");
+  const revealedMap: Record<number, Hint> = {};
+  revealedIndices.forEach((i) => { if (hints[i]) revealedMap[i] = hints[i]; });
 
   const rankingAttempts = await (prisma as any).challengeAttempt.findMany({
     where: { challengeId: challenge.id, completed: true },
@@ -54,9 +56,10 @@ export default async function DesafioPage() {
       challengeId={challenge.id}
       category={CATEGORY_LABELS[challenge.category] ?? challenge.category}
       totalHints={hints.length}
-      initialRevealedHints={revealedHints}
+      initialRevealedMap={revealedMap}
       initialAttempt={attempt ? {
         revealedHintsCount: attempt.revealedHintsCount,
+        revealedIndices,
         guessesUsed: attempt.guessesUsed,
         solved: attempt.solved,
         completed: attempt.completed,
@@ -65,8 +68,7 @@ export default async function DesafioPage() {
         answer: attempt.completed ? challenge.answer : undefined,
       } : null}
       initialRanking={ranking}
-      currentUserId={session.user.id}
-      currentUserName={session.user.name ?? ""}
+      currentUserUsername={session.user.username ?? ""}
     />
   );
 }

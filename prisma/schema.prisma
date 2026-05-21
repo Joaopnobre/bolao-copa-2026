@@ -112,6 +112,7 @@ model ChallengeAttempt {
   userId             String
   challengeId        String
   revealedHintsCount Int              @default(0)
+  revealedIndices    String           @default("[]")
   guessesUsed        Int              @default(0)
   solved             Boolean          @default(false)
   points             Float?

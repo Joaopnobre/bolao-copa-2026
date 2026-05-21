@@ -23,6 +23,7 @@ model User {
   predictions        Prediction[]
   specialPredictions SpecialPrediction[]
   actionLogs         ActionLog[]
+  challengeAttempts  ChallengeAttempt[]
 }
 
 model Match {
@@ -91,4 +92,46 @@ model SystemConfig {
   id    String @id @default(cuid())
   key   String @unique
   value String
+}
+
+model Challenge {
+  id          String             @id @default(cuid())
+  category    String
+  answer      String
+  aliases     String             @default("[]")
+  hints       String             @default("[]")
+  publishDate DateTime
+  status      String             @default("DRAFT")
+  createdAt   DateTime           @default(now())
+  updatedAt   DateTime           @updatedAt
+  attempts    ChallengeAttempt[]
+}
+
+model ChallengeAttempt {
+  id                 String           @id @default(cuid())
+  userId             String
+  challengeId        String
+  revealedHintsCount Int              @default(0)
+  guessesUsed        Int              @default(0)
+  solved             Boolean          @default(false)
+  points             Float?
+  completed          Boolean          @default(false)
+  completedAt        DateTime?
+  createdAt          DateTime         @default(now())
+  updatedAt          DateTime         @updatedAt
+  user               User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  challenge          Challenge        @relation(fields: [challengeId], references: [id], onDelete: Cascade)
+  guesses            ChallengeGuess[]
+
+  @@unique([userId, challengeId])
+}
+
+model ChallengeGuess {
+  id              String           @id @default(cuid())
+  attemptId       String
+  guess           String
+  normalizedGuess String
+  isCorrect       Boolean
+  createdAt       DateTime         @default(now())
+  attempt         ChallengeAttempt @relation(fields: [attemptId], references: [id], onDelete: Cascade)
 }

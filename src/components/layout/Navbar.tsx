@@ -88,6 +88,7 @@ export function Navbar() {
               gap: 2,
               flex: 1,
               overflowX: "auto",
+              justifyContent: "space-between",
             }}
             className="hide-on-mobile"
           >

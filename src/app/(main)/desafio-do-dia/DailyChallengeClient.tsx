@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 interface Hint {
@@ -53,6 +53,13 @@ export function DailyChallengeClient({
   const [revealedMap, setRevealedMap] = useState<Record<number, Hint>>(initialRevealedMap);
   const [lostTurn, setLostTurn] = useState(initialLostTurn);
   const [attempt, setAttempt] = useState<AttemptState | null>(initialAttempt);
+  const guessInputRef = useRef<HTMLInputElement>(null);
+
+  useEffect(() => {
+    if (lostTurn && !attempt?.completed) {
+      guessInputRef.current?.focus();
+    }
+  }, [lostTurn]);
   const [guess, setGuess] = useState("");
   const [loading, setLoading] = useState(false);
   const [revealingIndex, setRevealingIndex] = useState<number | null>(null);
@@ -192,10 +199,10 @@ export function DailyChallengeClient({
           border: "2px solid rgba(239,68,68,0.4)",
           borderRadius: 16, padding: "20px 24px", marginBottom: 20, textAlign: "center",
         }}>
-          <div style={{ fontSize: 40, marginBottom: 8 }}>💀</div>
-          <div style={{ fontSize: 18, fontWeight: 900, color: "#f87171", marginBottom: 4 }}>PERCA SUA VEZ!</div>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>⚠️</div>
+          <div style={{ fontSize: 18, fontWeight: 900, color: "#f87171", marginBottom: 4 }}>GASTE UM PALPITE!</div>
           <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>
-            Você não pode mais abrir dicas. Use seus palpites agora!
+            As dicas estão bloqueadas. Use seus palpites agora!
           </div>
         </div>
       )}
@@ -205,8 +212,8 @@ export function DailyChallengeClient({
           border: "2px solid rgba(239,68,68,0.4)",
           borderRadius: 16, padding: "20px 24px", marginBottom: 20, textAlign: "center",
         }}>
-          <div style={{ fontSize: 40, marginBottom: 8 }}>💀</div>
-          <div style={{ fontSize: 18, fontWeight: 900, color: "#f87171", marginBottom: 4 }}>PERCA SUA VEZ!</div>
+          <div style={{ fontSize: 40, marginBottom: 8 }}>⚠️</div>
+          <div style={{ fontSize: 18, fontWeight: 900, color: "#f87171", marginBottom: 4 }}>GASTE UM PALPITE!</div>
           <div style={{ fontSize: 13, color: "var(--text-secondary)" }}>Você encontrou a dica especial e não acertou. Desafio encerrado!</div>
         </div>
       )}
@@ -338,6 +345,7 @@ export function DailyChallengeClient({
         <div style={{ marginBottom: 28 }}>
           <form onSubmit={handleGuess} style={{ display: "flex", gap: 8 }}>
             <input
+              ref={guessInputRef}
               className="input-field"
               value={guess}
               onChange={(e) => setGuess(e.target.value)}

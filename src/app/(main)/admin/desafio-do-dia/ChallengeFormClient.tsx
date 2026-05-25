@@ -163,7 +163,7 @@ export function ChallengeFormClient({ challenge }: Props) {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
             <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text-primary)" }}>Dicas (exatamente 10)</div>
             <span style={{ fontSize: 12, color: loseTurnCount > 0 ? "#f87171" : "var(--text-secondary)" }}>
-              {loseTurnCount > 0 ? `⚠️ ${loseTurnCount} "Perca sua vez"` : "Nenhum especial"}
+              {loseTurnCount > 0 ? `⚠️ ${loseTurnCount} "Gaste um palpite"` : "Nenhum especial"}
             </span>
           </div>
           <div style={{ fontSize: 12, color: "var(--text-secondary)", marginBottom: 16 }}>
@@ -195,7 +195,7 @@ export function ChallengeFormClient({ challenge }: Props) {
                   style={{ width: 150 }}
                 >
                   <option value="NORMAL">Normal</option>
-                  <option value="LOSE_TURN">⚠️ Perca sua vez</option>
+                  <option value="LOSE_TURN">⚠️ Gaste um palpite</option>
                 </select>
               </div>
             ))}

@@ -130,13 +130,15 @@ export function DailyChallengeClient({
       }));
       setGuess("");
 
+      if (lostTurn && !data.completed) setLostTurn(false);
+
       if (data.isCorrect) {
         setFeedback({ type: "success", msg: "🎉 Correto! Parabéns!" });
       } else if (data.completed) {
         setFeedback({ type: "error", msg: "Tentativas esgotadas." });
       } else {
         const rem = 2 - data.guessesUsed;
-        setFeedback({ type: "info", msg: `❌ Incorreto. Você ainda tem ${rem} palpite${rem > 1 ? "s" : ""}.` });
+        setFeedback({ type: "info", msg: `❌ Incorreto. Você ainda tem ${rem} palpite${rem > 1 ? "s" : ""}. Continue revelando dicas!` });
       }
 
       if (data.completed) await refreshRanking();

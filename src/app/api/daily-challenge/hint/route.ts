@@ -38,13 +38,7 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "Dica já revelada" }, { status: 400 });
   }
 
-  // Block new hints if a LOSE_TURN was already revealed
   const existingHints = parseHints(challenge.hints);
-  const alreadyLostTurn = revealedIndices.some((i) => existingHints[i]?.type === "LOSE_TURN");
-  if (alreadyLostTurn) {
-    return NextResponse.json({ error: "Use seus palpites!" }, { status: 400 });
-  }
-
   const hint = existingHints[hintIndex];
   if (!hint) return NextResponse.json({ error: "Dica não encontrada" }, { status: 404 });
 

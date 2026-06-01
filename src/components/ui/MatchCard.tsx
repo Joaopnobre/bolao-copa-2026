@@ -29,6 +29,21 @@ interface MatchCardProps {
   compact?: boolean;
 }
 
+const GROUP_COLORS: Record<string, { bg: string; border: string; label: string }> = {
+  A: { bg: "rgba(239,68,68,0.06)",   border: "rgba(239,68,68,0.25)",   label: "#ef4444" },
+  B: { bg: "rgba(59,130,246,0.06)",  border: "rgba(59,130,246,0.25)",  label: "#3b82f6" },
+  C: { bg: "rgba(20,184,166,0.06)",  border: "rgba(20,184,166,0.25)",  label: "#14b8a6" },
+  D: { bg: "rgba(245,158,11,0.06)",  border: "rgba(245,158,11,0.25)",  label: "#f59e0b" },
+  E: { bg: "rgba(236,72,153,0.06)",  border: "rgba(236,72,153,0.25)",  label: "#ec4899" },
+  F: { bg: "rgba(249,115,22,0.06)",  border: "rgba(249,115,22,0.25)",  label: "#f97316" },
+  G: { bg: "rgba(34,197,94,0.06)",   border: "rgba(34,197,94,0.25)",   label: "#22c55e" },
+  H: { bg: "rgba(168,85,247,0.06)",  border: "rgba(168,85,247,0.25)",  label: "#a855f7" },
+  I: { bg: "rgba(6,182,212,0.06)",   border: "rgba(6,182,212,0.25)",   label: "#06b6d4" },
+  J: { bg: "rgba(99,102,241,0.06)",  border: "rgba(99,102,241,0.25)",  label: "#6366f1" },
+  K: { bg: "rgba(16,185,129,0.06)",  border: "rgba(16,185,129,0.25)",  label: "#10b981" },
+  L: { bg: "rgba(244,63,94,0.06)",   border: "rgba(244,63,94,0.25)",   label: "#f43f5e" },
+};
+
 const PHASE_LABELS: Record<string, string> = {
   GROUP: "Grupos",
   ROUND_OF_16: "16 Avos",
@@ -72,9 +87,14 @@ export function MatchCard({
 
   const predResult = prediction && hasResult ? getPredResult(prediction, match) : null;
 
+  const groupColor = match.groupName ? GROUP_COLORS[match.groupName] : null;
+
   const borderColor = finished ? "rgba(0,212,170,0.35)"
     : locked           ? "rgba(245,166,35,0.35)"
+    : groupColor       ? groupColor.border
     :                    "var(--border-color)";
+
+  const cardBg = groupColor ? groupColor.bg : "var(--bg-card)";
 
   const dateStr = matchDate.toLocaleDateString("pt-BR", { weekday: "short", day: "2-digit", month: "2-digit" });
   const timeStr = matchDate.toLocaleTimeString("pt-BR", { hour: "2-digit", minute: "2-digit" });
@@ -83,7 +103,7 @@ export function MatchCard({
     <div
       onClick={onClick}
       style={{
-        background: "var(--bg-card)",
+        background: cardBg,
         border: `1px solid ${borderColor}`,
         borderRadius: 14,
         padding: compact ? "12px 14px" : "16px",
@@ -102,7 +122,7 @@ export function MatchCard({
     >
       {/* Header */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 12 }}>
-        <span style={{ fontSize: 11, fontWeight: 600, color: "#8b5cf6", textTransform: "uppercase", letterSpacing: 0.5 }}>
+        <span style={{ fontSize: 11, fontWeight: 600, color: groupColor ? groupColor.label : "#8b5cf6", textTransform: "uppercase", letterSpacing: 0.5 }}>
           {match.groupName ? `Grupo ${match.groupName}` : PHASE_LABELS[match.phase] ?? match.phase}
           {match.round ? ` · R${match.round}` : ""}
         </span>

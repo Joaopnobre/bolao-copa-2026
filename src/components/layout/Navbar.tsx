@@ -7,7 +7,7 @@ import { useState } from "react";
 
 const navItems: { href: string; label: string; icon?: string; iconImg?: string }[] = [
   { href: "/dashboard", label: "Dashboard", iconImg: "/icons/thunder.png" },
-  { href: "/games", label: "Jogos", icon: "⚽" },
+  { href: "/games", label: "Jogos", iconImg: "/icons/match.png" },
   { href: "/predictions", label: "Palpites", iconImg: "/icons/goal.png" },
   { href: "/ranking", label: "Ranking", iconImg: "/icons/ranking.png" },
   { href: "/champion", label: "Campeão", iconImg: "/icons/crown.png" },

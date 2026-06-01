@@ -15,7 +15,7 @@ const navItems: { href: string; label: string; icon?: string; iconImg?: string }
   { href: "/desafio-do-dia", label: "Desafio!", iconImg: "/icons/control.png" },
 ];
 
-const adminItems = [
+const adminItems: { href: string; label: string; icon?: string; iconImg?: string }[] = [
   { href: "/admin", label: "Painel Admin", icon: "⚙️" },
 ];
 

@@ -149,7 +149,7 @@ export function DailyChallengeClient({
 
   return (
     <div style={{ maxWidth: 680, margin: "0 auto" }}>
-      <PageHeader title="Desafio do Dia!" subtitle="Toque em uma dica para revelá-la" icon="🎯" />
+      <PageHeader title="Desafio do Dia!" subtitle="Toque em uma dica para revelá-la" icon="/icons/control.png.png" />
 
       {/* Disclaimer */}
       <div style={{
@@ -180,7 +180,10 @@ export function DailyChallengeClient({
       }}>
         <div>
           <div style={{ fontSize: 11, opacity: 0.75, textTransform: "uppercase", letterSpacing: 1, marginBottom: 4 }}>Categoria</div>
-          <div style={{ fontSize: 22, fontWeight: 900 }}>🎯 EU SOU: {category.toUpperCase()}</div>
+          <div style={{ fontSize: 22, fontWeight: 900, display: "flex", alignItems: "center", gap: 8 }}>
+            <img src="/icons/goal.png.png" alt="" style={{ width: 24, height: 24, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+            EU SOU: {category.toUpperCase()}
+          </div>
         </div>
         <div style={{
           background: "rgba(249,194,0,0.2)",

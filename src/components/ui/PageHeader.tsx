@@ -18,7 +18,11 @@ export function PageHeader({ title, subtitle, icon, action }: PageHeaderProps) {
       }}
     >
       <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-        {icon && <span style={{ fontSize: 32 }}>{icon}</span>}
+        {icon && (
+          icon.startsWith("/")
+            ? <img src={icon} alt="" style={{ width: 36, height: 36, objectFit: "contain" }} />
+            : <span style={{ fontSize: 32 }}>{icon}</span>
+        )}
         <div>
           <h1
             style={{

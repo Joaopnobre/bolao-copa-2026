@@ -5,17 +5,17 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
 
-const navItems: { href: string; label: string; icon?: string; iconImg?: string }[] = [
-  { href: "/dashboard", label: "Dashboard", iconImg: "/icons/thunder.png" },
-  { href: "/games", label: "Jogos", iconImg: "/icons/match.png" },
-  { href: "/predictions", label: "Palpites", iconImg: "/icons/goal.png" },
-  { href: "/ranking", label: "Ranking", iconImg: "/icons/ranking.png" },
-  { href: "/champion", label: "Campeão", iconImg: "/icons/crown.png" },
-  { href: "/rules", label: "Regras", iconImg: "/icons/rules.png" },
-  { href: "/desafio-do-dia", label: "Desafio!", iconImg: "/icons/control.png" },
+const navItems = [
+  { href: "/dashboard", label: "Dashboard", icon: "⚡" },
+  { href: "/games", label: "Jogos", icon: "⚽" },
+  { href: "/predictions", label: "Palpites", icon: "🎯" },
+  { href: "/ranking", label: "Ranking", icon: "🏆" },
+  { href: "/champion", label: "Campeão", icon: "👑" },
+  { href: "/rules", label: "Regras", icon: "📋" },
+  { href: "/desafio-do-dia", label: "Desafio!", icon: "🎮" },
 ];
 
-const adminItems: { href: string; label: string; icon?: string; iconImg?: string }[] = [
+const adminItems = [
   { href: "/admin", label: "Painel Admin", icon: "⚙️" },
 ];
 
@@ -54,7 +54,7 @@ export function Navbar() {
               marginRight: 16,
             }}
           >
-            <img src="/icons/trophy.png" alt="" style={{ width: 32, height: 32, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+            <span style={{ fontSize: 24 }}>🏆</span>
             <div>
               <div
                 style={{
@@ -114,10 +114,7 @@ export function Navbar() {
                     whiteSpace: "nowrap",
                   }}
                 >
-                  {item.iconImg
-                    ? <img src={item.iconImg} alt="" style={{ width: 16, height: 16, objectFit: "contain", filter: "brightness(0) invert(1)", opacity: active ? 1 : 0.75 }} />
-                    : <span>{item.icon}</span>
-                  }
+                  <span>{item.icon}</span>
                   {item.label}
                 </Link>
               );
@@ -233,10 +230,7 @@ export function Navbar() {
                       background: active ? "var(--bg-card)" : "transparent",
                     }}
                   >
-                    {item.iconImg
-                      ? <img src={item.iconImg} alt="" style={{ width: 18, height: 18, objectFit: "contain", filter: "brightness(0) invert(0.6)" }} />
-                      : <span>{item.icon}</span>
-                    }
+                    <span>{item.icon}</span>
                     {item.label}
                   </Link>
                 );

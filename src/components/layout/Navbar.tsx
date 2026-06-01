@@ -54,7 +54,7 @@ export function Navbar() {
               marginRight: 16,
             }}
           >
-            <span style={{ fontSize: 24 }}>🏆</span>
+            <img src="/icons/trophy.png.png" alt="" style={{ width: 32, height: 32, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
             <div>
               <div
                 style={{

@@ -45,6 +45,7 @@ export default async function AdminPage() {
         <AdminAction href="/admin/rules" icon="📋" title="Editar Regras" desc="Alterar texto das regras" color="#00d4aa" />
         <AdminAction href="/admin/logs" icon="📊" title="Action Log" desc="Ver log de ações" color="#60a5fa" />
         <AdminAction href="/admin/desafio-do-dia" icon="🎯" title="Desafios do Dia" desc="Gerenciar desafios diários" color="#8b5cf6" />
+        <AdminAction href="/admin/special-predictions" icon="⚽" title="Artilheiro" desc="Corrigir palpites de artilheiro" color="#f97316" />
       </div>
 
       {/* Recent logs */}

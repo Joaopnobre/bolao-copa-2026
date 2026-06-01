@@ -6,13 +6,13 @@ import { usePathname } from "next/navigation";
 import { useState } from "react";
 
 const navItems: { href: string; label: string; icon?: string; iconImg?: string }[] = [
-  { href: "/dashboard", label: "Dashboard", iconImg: "/icons/thunder.png.png" },
+  { href: "/dashboard", label: "Dashboard", iconImg: "/icons/thunder.png" },
   { href: "/games", label: "Jogos", icon: "⚽" },
-  { href: "/predictions", label: "Palpites", iconImg: "/icons/goal.png.png" },
-  { href: "/ranking", label: "Ranking", iconImg: "/icons/ranking.png.png" },
-  { href: "/champion", label: "Campeão", iconImg: "/icons/crown.png.png" },
-  { href: "/rules", label: "Regras", iconImg: "/icons/rules.png.png" },
-  { href: "/desafio-do-dia", label: "Desafio!", iconImg: "/icons/control.png.png" },
+  { href: "/predictions", label: "Palpites", iconImg: "/icons/goal.png" },
+  { href: "/ranking", label: "Ranking", iconImg: "/icons/ranking.png" },
+  { href: "/champion", label: "Campeão", iconImg: "/icons/crown.png" },
+  { href: "/rules", label: "Regras", iconImg: "/icons/rules.png" },
+  { href: "/desafio-do-dia", label: "Desafio!", iconImg: "/icons/control.png" },
 ];
 
 const adminItems = [
@@ -54,7 +54,7 @@ export function Navbar() {
               marginRight: 16,
             }}
           >
-            <img src="/icons/trophy.png.png" alt="" style={{ width: 32, height: 32, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
+            <img src="/icons/trophy.png" alt="" style={{ width: 32, height: 32, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
             <div>
               <div
                 style={{

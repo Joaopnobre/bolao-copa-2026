@@ -15,6 +15,19 @@ export default async function AdminDesafiosPage() {
     include: { _count: { select: { attempts: true } } },
   });
 
+  const categoryCounts: Record<string, number> = {};
+  for (const c of challenges) {
+    categoryCounts[c.category] = (categoryCounts[c.category] ?? 0) + 1;
+  }
+
+  const CATEGORY_META: { key: string; icon: string }[] = [
+    { key: "PLAYER",         icon: "⚽" },
+    { key: "TEAM",           icon: "🏳️" },
+    { key: "STADIUM",        icon: "🏟️" },
+    { key: "HISTORIC_MATCH", icon: "📅" },
+    { key: "YEAR",           icon: "📆" },
+  ];
+
   return (
     <div>
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 24 }}>
@@ -22,6 +35,43 @@ export default async function AdminDesafiosPage() {
         <Link href="/admin/desafio-do-dia/new" className="btn-primary btn-gold" style={{ padding: "10px 20px", textDecoration: "none" }}>
           ➕ Novo Desafio
         </Link>
+      </div>
+
+      {/* Category counters */}
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 10, marginBottom: 24 }}>
+        {CATEGORY_META.map(({ key, icon }) => {
+          const count = categoryCounts[key] ?? 0;
+          return (
+            <div key={key} style={{
+              display: "flex", alignItems: "center", gap: 8,
+              background: "var(--bg-card)",
+              border: "1px solid var(--border-color)",
+              borderRadius: 10, padding: "8px 16px",
+            }}>
+              <span style={{ fontSize: 16 }}>{icon}</span>
+              <div>
+                <div style={{ fontSize: 11, color: "var(--text-secondary)", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  {CATEGORY_LABELS[key] ?? key}
+                </div>
+                <div style={{ fontSize: 20, fontWeight: 900, color: count > 0 ? "var(--text-primary)" : "var(--text-secondary)", lineHeight: 1.1 }}>
+                  {count}
+                </div>
+              </div>
+            </div>
+          );
+        })}
+        <div style={{
+          display: "flex", alignItems: "center", gap: 8,
+          background: "rgba(249,194,0,0.08)",
+          border: "1px solid rgba(249,194,0,0.2)",
+          borderRadius: 10, padding: "8px 16px",
+        }}>
+          <span style={{ fontSize: 16 }}>🎯</span>
+          <div>
+            <div style={{ fontSize: 11, color: "#F9C200", fontWeight: 600, textTransform: "uppercase", letterSpacing: 0.5 }}>Total</div>
+            <div style={{ fontSize: 20, fontWeight: 900, color: "#F9C200", lineHeight: 1.1 }}>{challenges.length}</div>
+          </div>
+        </div>
       </div>
 
       {challenges.length === 0 ? (

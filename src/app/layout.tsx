@@ -12,6 +12,7 @@ export const metadata: Metadata = {
   title: "Bolão Copa do Mundo 2026",
   description: "Bolão privado Copa do Mundo 2026",
   viewport: "width=device-width, initial-scale=1",
+  icons: { icon: "/icons/betting.png" },
 };
 
 export default function RootLayout({

@@ -17,6 +17,8 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
   const [scorer, setScorer] = useState(officialScorer);
   const [saving, setSaving] = useState<string | null>(null);
   const [feedback, setFeedback] = useState<Record<string, string>>({});
+  const [groupFilter, setGroupFilter] = useState<string>("ALL");
+  const [dateSort, setDateSort] = useState<"asc" | "desc">("asc");
 
   async function saveResult(matchId: string) {
     const r = results[matchId];
@@ -63,8 +65,18 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
     }
   }
 
-  const lockedMatches = matches.filter((m) => m.status === "LOCKED");
-  const upcomingMatches = matches.filter((m) => m.status === "UPCOMING");
+  const groups = [...new Set(matches.filter((m) => m.groupName).map((m) => m.groupName as string))].sort();
+
+  const applyFilters = (list: any[]) => {
+    const f = groupFilter === "ALL" ? list : list.filter((m) => m.groupName === groupFilter);
+    return [...f].sort((a, b) => {
+      const d = new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime();
+      return dateSort === "asc" ? d : -d;
+    });
+  };
+
+  const lockedMatches = applyFilters(matches.filter((m) => m.status === "LOCKED"));
+  const upcomingMatches = applyFilters(matches.filter((m) => m.status === "UPCOMING"));
 
   return (
     <div>
@@ -96,6 +108,20 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
           {saving === "special" ? "Salvando..." : "💾 Salvar Especiais"}
         </button>
       </div>
+
+      {/* Group + date filters */}
+      {groups.length > 0 && (
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 20 }}>
+          <AdminPillBtn active={groupFilter === "ALL"} onClick={() => setGroupFilter("ALL")}>Todos Grupos</AdminPillBtn>
+          {groups.map((g) => (
+            <AdminPillBtn key={g} active={groupFilter === g} onClick={() => setGroupFilter(g)}>Grupo {g}</AdminPillBtn>
+          ))}
+          <div style={{ width: 1, background: "var(--border-color)", height: 20, margin: "0 4px" }} />
+          <AdminPillBtn active={dateSort === "asc"} onClick={() => setDateSort(dateSort === "asc" ? "desc" : "asc")}>
+            {dateSort === "asc" ? "Data ↑" : "Data ↓"}
+          </AdminPillBtn>
+        </div>
+      )}
 
       {/* Locked matches */}
       {lockedMatches.length > 0 && (
@@ -145,6 +171,23 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
         </div>
       )}
     </div>
+  );
+}
+
+function AdminPillBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: "4px 12px", borderRadius: 999, fontSize: 11, fontWeight: 600,
+        cursor: "pointer", transition: "all 0.2s",
+        background: active ? "#f5a623" : "var(--bg-card)",
+        color: active ? "#000" : "var(--text-secondary)",
+        border: active ? "1px solid #f5a623" : "1px solid var(--border-color)",
+      }}
+    >
+      {children}
+    </button>
   );
 }
 

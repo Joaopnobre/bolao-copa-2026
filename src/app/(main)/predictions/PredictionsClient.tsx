@@ -16,9 +16,12 @@ interface Props {
 export function PredictionsClient({ matches, userPredictions, isViewer }: Props) {
   const router = useRouter();
   const [filter, setFilter] = useState<"all" | "pending" | "done">("all");
+  const [groupFilter, setGroupFilter] = useState<string>("ALL");
+  const [dateSort, setDateSort] = useState<"asc" | "desc">("asc");
   const [bulkOdds, setBulkOdds] = useState<Record<string, { counts: Record<string, number>; total: number }>>({});
 
   const predMap = new Map(userPredictions.map((p) => [p.matchId, p]));
+  const groups = [...new Set(matches.filter((m) => m.groupName).map((m) => m.groupName as string))].sort();
 
   // IDs dos jogos abertos com palpite do usuário — são os que precisam de odds
   const openMatchIds = matches
@@ -59,8 +62,17 @@ export function PredictionsClient({ matches, userPredictions, isViewer }: Props)
   const doneMatches = openMatches.filter((m) => predMap.has(m.id));
   const finishedWithPred = matches.filter((m) => m.status === "FINISHED" && predMap.has(m.id));
 
-  const displayed =
-    filter === "all" ? openMatches : filter === "pending" ? pendingMatches : doneMatches;
+  const applyFilters = (list: any[]) => {
+    const f = groupFilter === "ALL" ? list : list.filter((m) => m.groupName === groupFilter);
+    return [...f].sort((a, b) => {
+      const d = new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime();
+      return dateSort === "asc" ? d : -d;
+    });
+  };
+
+  const displayed = applyFilters(
+    filter === "all" ? openMatches : filter === "pending" ? pendingMatches : doneMatches
+  );
 
   return (
     <div>
@@ -106,6 +118,20 @@ export function PredictionsClient({ matches, userPredictions, isViewer }: Props)
               }}
             />
           </div>
+        </div>
+      )}
+
+      {/* Group + date filters */}
+      {groups.length > 0 && (
+        <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 12 }}>
+          <PillBtn active={groupFilter === "ALL"} onClick={() => setGroupFilter("ALL")}>Todos Grupos</PillBtn>
+          {groups.map((g) => (
+            <PillBtn key={g} active={groupFilter === g} onClick={() => setGroupFilter(g)}>Grupo {g}</PillBtn>
+          ))}
+          <div style={{ width: 1, background: "var(--border-color)", height: 20, margin: "0 4px" }} />
+          <PillBtn active={dateSort === "asc"} onClick={() => setDateSort(dateSort === "asc" ? "desc" : "asc")}>
+            {dateSort === "asc" ? "Data ↑" : "Data ↓"}
+          </PillBtn>
         </div>
       )}
 
@@ -172,7 +198,7 @@ export function PredictionsClient({ matches, userPredictions, isViewer }: Props)
             ✅ Resultados dos seus palpites
           </h2>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 10 }}>
-            {finishedWithPred.map((match) => {
+            {applyFilters(finishedWithPred).map((match) => {
               const pred = predMap.get(match.id);
               return (
                 <MatchCard
@@ -188,6 +214,23 @@ export function PredictionsClient({ matches, userPredictions, isViewer }: Props)
         </div>
       )}
     </div>
+  );
+}
+
+function PillBtn({ active, onClick, children }: { active: boolean; onClick: () => void; children: React.ReactNode }) {
+  return (
+    <button
+      onClick={onClick}
+      style={{
+        padding: "4px 12px", borderRadius: 999, fontSize: 11, fontWeight: 600,
+        cursor: "pointer", transition: "all 0.2s",
+        background: active ? "#3b82f6" : "var(--bg-card)",
+        color: active ? "white" : "var(--text-secondary)",
+        border: active ? "1px solid #3b82f6" : "1px solid var(--border-color)",
+      }}
+    >
+      {children}
+    </button>
   );
 }
 

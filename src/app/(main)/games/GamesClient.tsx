@@ -27,6 +27,7 @@ export function GamesClient({ matches, userPredictions, isAdmin }: Props) {
   const [filter, setFilter] = useState<string>("ALL");
   const [groupFilter, setGroupFilter] = useState<string>("ALL");
   const [statusFilter, setStatusFilter] = useState<string>("ALL");
+  const [dateSort, setDateSort] = useState<"asc" | "desc">("asc");
 
   const predMap = new Map(userPredictions.map((p) => [p.matchId, p]));
 
@@ -40,9 +41,14 @@ export function GamesClient({ matches, userPredictions, isAdmin }: Props) {
     return true;
   });
 
+  const sorted = [...filtered].sort((a, b) => {
+    const d = new Date(a.matchDate).getTime() - new Date(b.matchDate).getTime();
+    return dateSort === "asc" ? d : -d;
+  });
+
   // Group by phase
   const byPhase: Record<string, any[]> = {};
-  for (const m of filtered) {
+  for (const m of sorted) {
     if (!byPhase[m.phase]) byPhase[m.phase] = [];
     byPhase[m.phase].push(m);
   }
@@ -66,7 +72,7 @@ export function GamesClient({ matches, userPredictions, isAdmin }: Props) {
       />
 
       {/* Filters */}
-      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 24 }}>
+      <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
         <FilterButton active={filter === "ALL"} onClick={() => setFilter("ALL")}>
           Todas Fases
         </FilterButton>
@@ -77,22 +83,28 @@ export function GamesClient({ matches, userPredictions, isAdmin }: Props) {
         ))}
       </div>
 
+      {/* Group + date filters — always visible */}
+      <div style={{ display: "flex", gap: 6, flexWrap: "wrap", alignItems: "center", marginBottom: 16 }}>
+        {groups.length > 0 && (
+          <>
+            <FilterButton small active={groupFilter === "ALL"} onClick={() => setGroupFilter("ALL")}>
+              Todos Grupos
+            </FilterButton>
+            {groups.map((g) => (
+              <FilterButton key={g} small active={groupFilter === g} onClick={() => setGroupFilter(g as string)}>
+                Grupo {g}
+              </FilterButton>
+            ))}
+            <div style={{ width: 1, background: "var(--border-color)", height: 20, margin: "0 4px" }} />
+          </>
+        )}
+        <FilterButton small active={dateSort === "asc"} onClick={() => setDateSort(dateSort === "asc" ? "desc" : "asc")}>
+          {dateSort === "asc" ? "Data ↑" : "Data ↓"}
+        </FilterButton>
+      </div>
+
       {filter === "GROUP" || filter === "ALL" ? (
         <>
-          {/* Group filter */}
-          {filter === "GROUP" && (
-            <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 20 }}>
-              <FilterButton small active={groupFilter === "ALL"} onClick={() => setGroupFilter("ALL")}>
-                Todos Grupos
-              </FilterButton>
-              {groups.map((g) => (
-                <FilterButton key={g} small active={groupFilter === g} onClick={() => setGroupFilter(g as string)}>
-                  Grupo {g}
-                </FilterButton>
-              ))}
-            </div>
-          )}
-
           {filter === "ALL" && (
             <div style={{ display: "flex", gap: 6, marginBottom: 16 }}>
               <FilterButton small active={statusFilter === "ALL"} onClick={() => setStatusFilter("ALL")}>

@@ -119,80 +119,39 @@ export function GamesClient({ matches, userPredictions, isAdmin }: Props) {
             </div>
           )}
 
-          {/* Group phase: show by group */}
+          {/* Group phase: flat list sorted by date */}
           {filter === "GROUP" && (
-            <div style={{ display: "flex", flexDirection: "column", gap: 24 }}>
-              {Object.entries(groupsByName)
-                .filter(([g]) => groupFilter === "ALL" || g === groupFilter)
-                .sort(([a], [b]) => a.localeCompare(b))
-                .map(([group, gMatches]) => (
-                  <div key={group}>
-                    <SectionTitle title={`Grupo ${group}`} count={gMatches.length} />
-                    <div
-                      style={{
-                        display: "grid",
-                        gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))",
-                        gap: 10,
-                      }}
-                    >
-                      {gMatches.map((match) => (
-                        <MatchCard
-                          key={match.id}
-                          match={match}
-                          prediction={predMap.get(match.id) ?? null}
-                          showPrediction
-                          onClick={() => router.push(`/predictions/${match.id}`)}
-                        />
-                      ))}
-                    </div>
-                  </div>
-                ))}
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 10 }}>
+              {(byPhase["GROUP"] ?? []).map((match) => (
+                <MatchCard
+                  key={match.id}
+                  match={match}
+                  prediction={predMap.get(match.id) ?? null}
+                  showPrediction
+                  onClick={() => router.push(`/predictions/${match.id}`)}
+                />
+              ))}
             </div>
           )}
 
-          {/* All phases */}
+          {/* All phases: flat list sorted by date */}
           {filter === "ALL" && (
             <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
               {PHASE_ORDER.filter((p) => byPhase[p]?.length > 0).map((phase) => (
                 <div key={phase}>
-                  <SectionTitle title={PHASE_LABELS[phase]} count={byPhase[phase].length} phase={phase} />
-                  {phase === "GROUP" ? (
-                    <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-                      {Object.entries(groupsByName)
-                        .sort(([a], [b]) => a.localeCompare(b))
-                        .map(([group, gMatches]) => (
-                          <div key={group}>
-                            <div style={{ fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 8, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                              Grupo {group}
-                            </div>
-                            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 8 }}>
-                              {gMatches.filter((m: any) => statusFilter === "ALL" || m.status === statusFilter).map((match: any) => (
-                                <MatchCard
-                                  key={match.id}
-                                  match={match}
-                                  prediction={predMap.get(match.id) ?? null}
-                                  showPrediction
-                                  onClick={() => router.push(`/predictions/${match.id}`)}
-                                  compact
-                                />
-                              ))}
-                            </div>
-                          </div>
-                        ))}
-                    </div>
-                  ) : (
-                    <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 10 }}>
-                      {byPhase[phase].filter((m) => statusFilter === "ALL" || m.status === statusFilter).map((match) => (
-                        <MatchCard
-                          key={match.id}
-                          match={match}
-                          prediction={predMap.get(match.id) ?? null}
-                          showPrediction
-                          onClick={() => router.push(`/predictions/${match.id}`)}
-                        />
-                      ))}
-                    </div>
-                  )}
+                  <SectionTitle title={PHASE_LABELS[phase]} count={byPhase[phase].filter((m: any) => statusFilter === "ALL" || m.status === statusFilter).length} phase={phase} />
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 8 }}>
+                    {byPhase[phase].filter((m) => statusFilter === "ALL" || m.status === statusFilter).map((match) => (
+                      <MatchCard
+                        key={match.id}
+                        match={match}
+                        prediction={predMap.get(match.id) ?? null}
+                        showPrediction
+                        onClick={() => router.push(`/predictions/${match.id}`)}
+                        compact
+                      />
+                    ))}
+                  </div>
                 </div>
               ))}
             </div>

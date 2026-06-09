@@ -41,19 +41,23 @@ export function PredictionsClient({ matches, userPredictions, isViewer }: Props)
     return () => clearInterval(interval);
   }, [openMatchIds.join(",")]);
 
-  // Calcula pontuação esperada — ambas (exato e vencedor) usam o mesmo k
-  // k = quantas pessoas palpitaram aquele placar específico
   function getExpectedPts(matchId: string, pred: { homeScore: number; awayScore: number } | undefined) {
     if (!pred) return null;
     const oddData = bulkOdds[matchId];
     if (!oddData) return null;
-    const N   = Math.max(oddData.total, 1);
+    const N = Math.max(oddData.total, 1);
+
     const key = `${pred.homeScore}-${pred.awayScore}`;
-    const k   = Math.max(oddData.counts[key] ?? 1, 1);
-    const odd = calculateOdd(k, N);
+    const k_exact = Math.max(oddData.counts[key] ?? 1, 1);
+    const oddExact = calculateOdd(k_exact, N);
+
+    const outcome = pred.homeScore > pred.awayScore ? "home" : pred.awayScore > pred.homeScore ? "away" : "draw";
+    const k_winner = Math.max((oddData as any).winnerCounts?.[outcome] ?? 1, 1);
+    const oddWinner = calculateOdd(k_winner, N);
+
     return {
-      exact:  ODDS_CONFIG.POINTS.EXACT_SCORE * odd,
-      winner: ODDS_CONFIG.POINTS.WINNER * odd,
+      exact:  ODDS_CONFIG.POINTS.EXACT_SCORE * oddExact,
+      winner: ODDS_CONFIG.POINTS.WINNER * oddWinner,
     };
   }
 

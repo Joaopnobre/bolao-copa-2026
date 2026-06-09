@@ -23,13 +23,14 @@ export async function GET(req: Request) {
     prisma.user.count({ where: { isActive: true, role: "PARTICIPANT" } }),
   ]);
 
-  // Agrupa por matchId → { "2-1": 3, "1-0": 1 }
-  const result: Record<string, { counts: Record<string, number>; total: number }> = {};
-  for (const id of matchIds) result[id] = { counts: {}, total: totalParticipants };
+  const result: Record<string, { counts: Record<string, number>; winnerCounts: Record<string, number>; total: number }> = {};
+  for (const id of matchIds) result[id] = { counts: {}, winnerCounts: {}, total: totalParticipants };
 
   for (const p of predictions) {
     const key = `${p.homeScore}-${p.awayScore}`;
     result[p.matchId].counts[key] = (result[p.matchId].counts[key] ?? 0) + 1;
+    const outcome = p.homeScore > p.awayScore ? "home" : p.awayScore > p.homeScore ? "away" : "draw";
+    result[p.matchId].winnerCounts[outcome] = (result[p.matchId].winnerCounts[outcome] ?? 0) + 1;
   }
 
   return NextResponse.json(result);

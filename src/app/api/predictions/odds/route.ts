@@ -22,12 +22,14 @@ export async function GET(req: Request) {
     where: { isActive: true, role: "PARTICIPANT" },
   });
 
-  // Conta quantas pessoas escolheram cada placar
   const counts: Record<string, number> = {};
+  const winnerCounts: Record<string, number> = {};
   for (const p of predictions) {
     const key = `${p.homeScore}-${p.awayScore}`;
     counts[key] = (counts[key] ?? 0) + 1;
+    const outcome = p.homeScore > p.awayScore ? "home" : p.awayScore > p.homeScore ? "away" : "draw";
+    winnerCounts[outcome] = (winnerCounts[outcome] ?? 0) + 1;
   }
 
-  return NextResponse.json({ counts, total: totalParticipants });
+  return NextResponse.json({ counts, winnerCounts, total: totalParticipants });
 }

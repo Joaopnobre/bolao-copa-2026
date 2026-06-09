@@ -30,8 +30,7 @@ export function PredictionFormClient({ match, prediction, allPredictions, userId
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; msg: string } | null>(null);
   const [deleting, setDeleting] = useState(false);
 
-  // Dados de odds
-  const [oddData, setOddData] = useState<{ counts: Record<string, number>; total: number } | null>(null);
+  const [oddData, setOddData] = useState<{ counts: Record<string, number>; winnerCounts: Record<string, number>; total: number } | null>(null);
 
   const matchDate = new Date(match.matchDate);
   const lockTime  = getLockTime(matchDate);
@@ -53,27 +52,37 @@ export function PredictionFormClient({ match, prediction, allPredictions, userId
     return () => clearInterval(interval);
   }, [match.id, isLocked, finished]);
 
-  // Fórmula da planilha: odd = max(0.5, 1 - 0.5 * ((k-1)/(N-1))^0.8)
-  // Tanto placar exato quanto vencedor usam o mesmo k — pessoas com aquele placar específico.
-  // Quem palpitou 2x1 compete separado de quem palpitou 2x0, mesmo que ambos acertem o vencedor.
   function calcOdds() {
     if (!oddData || homeScore === "" || awayScore === "") return null;
 
     const N   = Math.max(oddData.total, 1);
     const key = `${homeScore}-${awayScore}`;
+    const outcome = parseInt(homeScore) > parseInt(awayScore) ? "home"
+      : parseInt(awayScore) > parseInt(homeScore) ? "away" : "draw";
 
-    // Desconta o próprio usuário se já tem esse palpite (já está contado)
-    const alreadyHasThis =
+    // k_exact: desconta o próprio usuário se já tem esse placar exato
+    const alreadyHasThisExact =
       prediction?.homeScore?.toString() === homeScore &&
       prediction?.awayScore?.toString() === awayScore;
-    const k   = (oddData.counts[key] ?? 0) + (alreadyHasThis ? 0 : 1);
-    const odd = calculateOdd(Math.max(k, 1), N);
+    const k_exact = (oddData.counts[key] ?? 0) + (alreadyHasThisExact ? 0 : 1);
+
+    // k_winner: desconta o usuário se o palpite atual já está contado no mesmo outcome
+    const prevOutcome = prediction
+      ? (prediction.homeScore > prediction.awayScore ? "home" : prediction.awayScore > prediction.homeScore ? "away" : "draw")
+      : null;
+    const alreadyCountedForOutcome = prevOutcome === outcome;
+    const k_winner = (oddData.winnerCounts?.[outcome] ?? 0) + (alreadyCountedForOutcome ? 0 : 1);
+
+    const oddExact  = calculateOdd(Math.max(k_exact, 1), N);
+    const oddWinner = calculateOdd(Math.max(k_winner, 1), N);
 
     return {
-      odd,
-      ptsExact:  ODDS_CONFIG.POINTS.EXACT_SCORE * odd,
-      ptsWinner: ODDS_CONFIG.POINTS.WINNER * odd,
-      k,
+      oddExact,
+      oddWinner,
+      ptsExact:  ODDS_CONFIG.POINTS.EXACT_SCORE * oddExact,
+      ptsWinner: ODDS_CONFIG.POINTS.WINNER * oddWinner,
+      k_exact,
+      k_winner,
     };
   }
 
@@ -262,50 +271,50 @@ export function PredictionFormClient({ match, prediction, allPredictions, userId
               }}>
                 {/* Placar exato */}
                 <div style={{
-                  background: odds.odd >= 0.85 ? "linear-gradient(135deg, #f0fdf4, #dcfce7)"
-                    : odds.odd >= 0.65 ? "linear-gradient(135deg, #fffbeb, #fef3c7)"
+                  background: odds.oddExact >= 0.85 ? "linear-gradient(135deg, #f0fdf4, #dcfce7)"
+                    : odds.oddExact >= 0.65 ? "linear-gradient(135deg, #fffbeb, #fef3c7)"
                     : "linear-gradient(135deg, #fef2f2, #fee2e2)",
-                  border: `2px solid ${oddColor(odds.odd)}`,
+                  border: `2px solid ${oddColor(odds.oddExact)}`,
                   borderRadius: 12,
                   padding: "12px 14px",
                   textAlign: "center",
                 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: oddColor(odds.odd), marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                  <div style={{ fontSize: 11, fontWeight: 700, color: oddColor(odds.oddExact), marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>
                     🎯 Se acertar o placar exato
                   </div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: oddColor(odds.odd), lineHeight: 1 }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: oddColor(odds.oddExact), lineHeight: 1 }}>
                     {odds.ptsExact.toFixed(1)}
                     <span style={{ fontSize: 13, fontWeight: 600, marginLeft: 3 }}>pts</span>
                   </div>
                   <div style={{ fontSize: 10, color: "#64748b", marginTop: 4 }}>
-                    odd {(odds.odd * 100).toFixed(0)}% · {odds.k} pessoa{odds.k !== 1 ? "s" : ""} com {homeScore}–{awayScore}
+                    odd {(odds.oddExact * 100).toFixed(0)}% · {odds.k_exact} pessoa{odds.k_exact !== 1 ? "s" : ""} com {homeScore}–{awayScore}
                   </div>
                 </div>
 
                 {/* Só o vencedor */}
                 <div style={{
-                  background: odds.odd >= 0.85 ? "linear-gradient(135deg, #f0fdf4, #dcfce7)"
-                    : odds.odd >= 0.65 ? "linear-gradient(135deg, #fffbeb, #fef3c7)"
+                  background: odds.oddWinner >= 0.85 ? "linear-gradient(135deg, #f0fdf4, #dcfce7)"
+                    : odds.oddWinner >= 0.65 ? "linear-gradient(135deg, #fffbeb, #fef3c7)"
                     : "linear-gradient(135deg, #fef2f2, #fee2e2)",
-                  border: `2px solid ${oddColor(odds.odd)}`,
+                  border: `2px solid ${oddColor(odds.oddWinner)}`,
                   borderRadius: 12,
                   padding: "12px 14px",
                   textAlign: "center",
                 }}>
-                  <div style={{ fontSize: 11, fontWeight: 700, color: oddColor(odds.odd), marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>
-                    ✅ Se acertar só o resultado
+                  <div style={{ fontSize: 11, fontWeight: 700, color: oddColor(odds.oddWinner), marginBottom: 4, textTransform: "uppercase", letterSpacing: 0.5 }}>
+                    ✅ Se acertar o vencedor
                   </div>
-                  <div style={{ fontSize: 28, fontWeight: 900, color: oddColor(odds.odd), lineHeight: 1 }}>
+                  <div style={{ fontSize: 28, fontWeight: 900, color: oddColor(odds.oddWinner), lineHeight: 1 }}>
                     {odds.ptsWinner.toFixed(1)}
                     <span style={{ fontSize: 13, fontWeight: 600, marginLeft: 3 }}>pts</span>
                   </div>
                   <div style={{ fontSize: 10, color: "#64748b", marginTop: 4 }}>
-                    mesma odd — {odds.k} pessoa{odds.k !== 1 ? "s" : ""} com {homeScore}–{awayScore}
+                    odd {(odds.oddWinner * 100).toFixed(0)}% · {odds.k_winner} pessoa{odds.k_winner !== 1 ? "s" : ""} com o mesmo vencedor
                   </div>
                 </div>
               </div>
               <div style={{ fontSize: 11, color: "var(--text-secondary)", textAlign: "center" }}>
-                💡 Odds baseadas no placar específico — 2×1 e 2×0 têm odds independentes. Atualiza a cada 10s.
+                💡 Placar exato e vencedor têm odds independentes. Atualiza a cada 10s.
               </div>
             </div>
           ) : homeScore !== "" && awayScore !== "" ? (

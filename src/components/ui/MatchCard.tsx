@@ -218,7 +218,7 @@ export function MatchCard({
                   </div>
                   <div style={{ width: 1, background: "var(--border-color)" }} />
                   <div style={{ flex: 1, textAlign: "center" }}>
-                    <div style={{ fontSize: 10, color: "var(--text-secondary)", marginBottom: 1 }}>✅ Se resultado</div>
+                    <div style={{ fontSize: 10, color: "var(--text-secondary)", marginBottom: 1 }}>✅ Se vencedor</div>
                     <div style={{ fontSize: 14, fontWeight: 800, color: "#d97706" }}>
                       {expectedPts.winner.toFixed(1)} pts
                     </div>

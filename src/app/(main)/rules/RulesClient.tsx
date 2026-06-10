@@ -67,12 +67,12 @@ function renderMarkdown(content: string) {
     } else if (line.startsWith("### ")) {
       elements.push(<h3 key={i} style={{ fontSize: 15, fontWeight: 700, color: "#60a5fa", margin: "16px 0 6px" }}>{line.slice(4)}</h3>);
     } else if (line.startsWith("- ")) {
-      const text = line.slice(2).replace(/\*\*(.+?)\*\*/g, (_, m) => `<strong style="color:var(--text-primary)">${m}</strong>`);
+      const text = line.slice(2).replace(/\*\*(.+?)\*\*/g, (_, m) => `<strong style="color:var(--text-secondary)">${m}</strong>`);
       elements.push(<li key={i} style={{ fontSize: 14, color: "var(--text-secondary)", marginBottom: 4, paddingLeft: 4, lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: text }} />);
     } else if (line.trim() === "") {
       elements.push(<div key={i} style={{ height: 8 }} />);
     } else {
-      const text = line.replace(/\*\*(.+?)\*\*/g, (_, m) => `<strong style="color:var(--text-primary)">${m}</strong>`);
+      const text = line.replace(/\*\*(.+?)\*\*/g, (_, m) => `<strong style="color:var(--text-secondary)">${m}</strong>`);
       elements.push(<p key={i} style={{ fontSize: 14, color: "var(--text-secondary)", margin: "0 0 8px", lineHeight: 1.6 }} dangerouslySetInnerHTML={{ __html: text }} />);
     }
     i++;

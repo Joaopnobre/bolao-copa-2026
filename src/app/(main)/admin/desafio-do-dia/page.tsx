@@ -26,6 +26,7 @@ export default async function AdminDesafiosPage() {
     { key: "STADIUM",        icon: "🏟️" },
     { key: "HISTORIC_MATCH", icon: "📅" },
     { key: "YEAR",           icon: "📆" },
+    { key: "MUSIC",          icon: "🎵" },
   ];
 
   return (

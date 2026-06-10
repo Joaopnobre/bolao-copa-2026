@@ -11,6 +11,7 @@ const CATEGORIES = [
   { value: "STADIUM", label: "Estádio" },
   { value: "HISTORIC_MATCH", label: "Partida Histórica" },
   { value: "YEAR", label: "Ano" },
+  { value: "MUSIC", label: "Música" },
 ];
 
 const EMPTY_HINTS: Hint[] = Array(10).fill(null).map(() => ({ text: "", type: "NORMAL" as const }));

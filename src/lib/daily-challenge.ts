@@ -9,6 +9,7 @@ export const CATEGORY_LABELS: Record<string, string> = {
   STADIUM: "Estádio",
   HISTORIC_MATCH: "Partida Histórica",
   YEAR: "Ano",
+  MUSIC: "Música",
 };
 
 export function normalizeText(text: string): string {

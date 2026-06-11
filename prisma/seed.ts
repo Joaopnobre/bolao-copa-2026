@@ -43,13 +43,13 @@ function slugify(text: string): string {
 
 // Copa do Mundo 2026 - dates from spreadsheet (Excel serial date 46184 = June 11, 2026)
 // Excel date 46184 = 2026-06-11
+// `time` está em horário de Brasília (UTC-3); soma-se 3h para obter o instante UTC,
+// independente do fuso horário da máquina que roda o seed.
 function excelDate(serial: number, timeStr: string): Date {
   // Excel epoch: Jan 0, 1900 (but with leap year bug, so Jan 1, 1900 = 1)
-  const excelEpoch = new Date(1899, 11, 30); // Dec 30, 1899
-  const date = new Date(excelEpoch.getTime() + serial * 86400000);
+  const excelEpochUTC = Date.UTC(1899, 11, 30); // Dec 30, 1899
   const [hours, minutes] = timeStr.split(":").map(Number);
-  date.setHours(hours, minutes, 0, 0);
-  return date;
+  return new Date(excelEpochUTC + serial * 86400000 + (hours + 3) * 3600000 + minutes * 60000);
 }
 
 const matches = [
@@ -78,7 +78,7 @@ const matches = [
   { homeTeam: "Estados Unidos", awayTeam: "Paraguai", groupName: "D", round: 1, excelDay: 46185, time: "22:00" },
   { homeTeam: "Austrália", awayTeam: "Turquia", groupName: "D", round: 1, excelDay: 46187, time: "01:00" },
   { homeTeam: "Estados Unidos", awayTeam: "Austrália", groupName: "D", round: 2, excelDay: 46192, time: "16:00" },
-  { homeTeam: "Turquia", awayTeam: "Paraguai", groupName: "D", round: 2, excelDay: 46193, time: "01:00" },
+  { homeTeam: "Turquia", awayTeam: "Paraguai", groupName: "D", round: 2, excelDay: 46193, time: "00:00" },
   { homeTeam: "Turquia", awayTeam: "Estados Unidos", groupName: "D", round: 3, excelDay: 46198, time: "23:00" },
   { homeTeam: "Paraguai", awayTeam: "Austrália", groupName: "D", round: 3, excelDay: 46198, time: "23:00" },
   // === GRUPO E ===

@@ -227,6 +227,7 @@ export function RankingClient({ ranking, currentUserId, paidCount }: Props) {
         {ranking.map((entry, idx) => {
           const isMe = entry.id === currentUserId;
           const isTop = idx < 3;
+          const isBottom4 = ranking.length > 3 && idx >= ranking.length - 4;
           return (
             <div
               key={entry.id}
@@ -248,7 +249,7 @@ export function RankingClient({ ranking, currentUserId, paidCount }: Props) {
                 {idx < 3 ? (
                   <span style={{ fontSize: 20 }}>{MEDALS[idx]}</span>
                 ) : (
-                  <span style={{ fontSize: 14, color: "var(--text-secondary)" }}>{idx + 1}</span>
+                  <span style={{ fontSize: 14, color: isBottom4 ? "#ef4444" : "var(--text-secondary)" }}>{idx + 1}</span>
                 )}
               </div>
 

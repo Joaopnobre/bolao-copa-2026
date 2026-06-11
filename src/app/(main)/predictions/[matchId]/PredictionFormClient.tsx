@@ -233,7 +233,7 @@ export function PredictionFormClient({ match, prediction, allPredictions, userId
                 className="score-input"
                 min={0} max={20}
                 value={homeScore}
-                onChange={(e) => setHomeScore(e.target.value)}
+                onChange={(e) => setHomeScore(e.target.value.replace(/^0+(?=\d)/, ""))}
                 placeholder="0"
                 style={{ width: 64, height: 64, fontSize: 28 }}
               />
@@ -253,7 +253,7 @@ export function PredictionFormClient({ match, prediction, allPredictions, userId
                 className="score-input"
                 min={0} max={20}
                 value={awayScore}
-                onChange={(e) => setAwayScore(e.target.value)}
+                onChange={(e) => setAwayScore(e.target.value.replace(/^0+(?=\d)/, ""))}
                 placeholder="0"
                 style={{ width: 64, height: 64, fontSize: 28 }}
               />

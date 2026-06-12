@@ -22,16 +22,17 @@ export function calculateOdd(k: number, N: number): number {
   return Math.max(ODDS_CONFIG.MIN_ODD, odd);
 }
 
-// REGRA: tanto placar exato quanto vencedor/empate usam o mesmo k —
-// quantas pessoas palpitaram AQUELE placar específico.
-// Ex: jogo termina 1x0. Quem palpitou 2x1 compete só com quem
-// também palpitou 2x1 (não com quem palpitou 3x0, mesmo vencedor).
+// REGRA: placar exato e vencedor/empate usam odds independentes.
+// - Cravou o placar exato: k_exact = quantas pessoas palpitaram AQUELE placar específico.
+// - Acertou só o vencedor (não cravou): k_winner = quantas pessoas palpitaram naquele
+//   vencedor/empate, independente do placar exato de cada uma.
 export function calculateMatchPoints(
   predHome: number,
   predAway: number,
   actualHome: number,
   actualAway: number,
-  k_exact: number, // pessoas com o mesmo placar exato
+  k_exact: number,  // pessoas com o mesmo placar exato
+  k_winner: number, // pessoas que acertaram o mesmo vencedor/empate
   N: number
 ): { points: number; type: "exact" | "winner" | "none" } {
   const isExact = predHome === actualHome && predAway === actualAway;
@@ -42,11 +43,8 @@ export function calculateMatchPoints(
     predHome > predAway ? "home" : predAway > predHome ? "away" : "draw";
   const isWinner = predWinner === actualWinner;
 
-  // odd calculada sempre sobre o placar específico (k_exact)
-  const odd = calculateOdd(k_exact, N);
-
-  if (isExact) return { points: ODDS_CONFIG.POINTS.EXACT_SCORE * odd, type: "exact" };
-  if (isWinner) return { points: ODDS_CONFIG.POINTS.WINNER * odd, type: "winner" };
+  if (isExact) return { points: ODDS_CONFIG.POINTS.EXACT_SCORE * calculateOdd(k_exact, N), type: "exact" };
+  if (isWinner) return { points: ODDS_CONFIG.POINTS.WINNER * calculateOdd(k_winner, N), type: "winner" };
   return { points: 0, type: "none" };
 }
 

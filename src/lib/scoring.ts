@@ -14,24 +14,29 @@ export async function recalculateMatchScores(matchId: string) {
   });
   const N = Math.max(totalParticipants, 1);
 
-  // Agrupa por placar exato — cada placar tem seu próprio k
+  // Agrupa por placar exato — cada placar tem seu próprio k_exact
   const exactGroups: Record<string, number> = {};
+  // Agrupa por vencedor/empate — cada outcome tem seu próprio k_winner
+  const winnerGroups: Record<string, number> = {};
   for (const pred of match.predictions) {
     const key = `${pred.homeScore}-${pred.awayScore}`;
     exactGroups[key] = (exactGroups[key] ?? 0) + 1;
+    const outcome = pred.homeScore > pred.awayScore ? "home" : pred.awayScore > pred.homeScore ? "away" : "draw";
+    winnerGroups[outcome] = (winnerGroups[outcome] ?? 0) + 1;
   }
 
-  // Cada predição usa o k do seu próprio placar exato
-  // — válido tanto para acerto exato quanto para acerto de vencedor
   const updates = match.predictions.map((pred) => {
     const key = `${pred.homeScore}-${pred.awayScore}`;
-    const k = exactGroups[key] ?? 1;
+    const outcome = pred.homeScore > pred.awayScore ? "home" : pred.awayScore > pred.homeScore ? "away" : "draw";
+    const k_exact = exactGroups[key] ?? 1;
+    const k_winner = winnerGroups[outcome] ?? 1;
     const { points } = calculateMatchPoints(
       pred.homeScore,
       pred.awayScore,
       match.homeScore!,
       match.awayScore!,
-      k,
+      k_exact,
+      k_winner,
       N
     );
     return prisma.prediction.update({

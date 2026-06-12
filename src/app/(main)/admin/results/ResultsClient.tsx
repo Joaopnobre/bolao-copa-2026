@@ -48,6 +48,30 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
     }
   }
 
+  async function resetResult(matchId: string) {
+    if (!confirm("Zerar esse resultado? Os pontos de todos os palpites para esse jogo voltam a zero e o jogo volta para Pendentes.")) return;
+    setSaving(matchId);
+    try {
+      const res = await fetch(`/api/admin/results`, {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ matchId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Erro");
+      setResults((r) => {
+        const { [matchId]: _removed, ...rest } = r;
+        return rest;
+      });
+      setFeedback((f) => ({ ...f, [matchId]: "✅ Resultado zerado!" }));
+      setTimeout(() => router.refresh(), 800);
+    } catch (e: any) {
+      setFeedback((f) => ({ ...f, [matchId]: `❌ ${e.message}` }));
+    } finally {
+      setSaving(null);
+    }
+  }
+
   async function saveSpecial() {
     setSaving("special");
     try {
@@ -161,6 +185,7 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
                 value={rowValue(match)}
                 onChange={(v) => setResults((r) => ({ ...r, [match.id]: v }))}
                 onSave={() => saveResult(match.id)}
+                onReset={() => resetResult(match.id)}
                 saving={saving === match.id}
                 feedback={feedback[match.id] ?? ""}
                 finished
@@ -198,12 +223,13 @@ function AdminPillBtn({ active, onClick, children }: { active: boolean; onClick:
 }
 
 function MatchResultRow({
-  match, value, onChange, onSave, saving, feedback, finished,
+  match, value, onChange, onSave, onReset, saving, feedback, finished,
 }: {
   match: any;
   value: { home: string; away: string };
   onChange: (v: { home: string; away: string }) => void;
   onSave: () => void;
+  onReset?: () => void;
   saving: boolean;
   feedback: string;
   finished?: boolean;
@@ -254,14 +280,26 @@ function MatchResultRow({
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 4, alignItems: "flex-end" }}>
-        <button
-          onClick={onSave}
-          disabled={saving}
-          className="btn-primary"
-          style={{ padding: "8px 16px", fontSize: 13, opacity: saving ? 0.7 : 1 }}
-        >
-          {saving ? "..." : "✅ Salvar"}
-        </button>
+        <div style={{ display: "flex", gap: 6 }}>
+          <button
+            onClick={onSave}
+            disabled={saving}
+            className="btn-primary"
+            style={{ padding: "8px 16px", fontSize: 13, opacity: saving ? 0.7 : 1 }}
+          >
+            {saving ? "..." : "✅ Salvar"}
+          </button>
+          {finished && onReset && (
+            <button
+              onClick={onReset}
+              disabled={saving}
+              className="btn-primary btn-danger"
+              style={{ padding: "8px 16px", fontSize: 13, opacity: saving ? 0.7 : 1 }}
+            >
+              🔄 Zerar
+            </button>
+          )}
+        </div>
         {feedback && (
           <span style={{ fontSize: 12, color: feedback.startsWith("✅") ? "#00d4aa" : "#ef4444" }}>
             {feedback}

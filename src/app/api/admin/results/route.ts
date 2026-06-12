@@ -39,6 +39,34 @@ export async function POST(req: Request) {
   return NextResponse.json(match);
 }
 
+// DELETE: Reset match result (zera placar e pontos, volta para pendente)
+export async function DELETE(req: Request) {
+  const session = await getServerSession(authOptions);
+  if (!session || session.user.role !== "ADMIN") {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+
+  const { matchId } = await req.json();
+
+  const match = await prisma.match.update({
+    where: { id: matchId },
+    data: { homeScore: null, awayScore: null, status: "UPCOMING" },
+  });
+
+  await prisma.prediction.updateMany({
+    where: { matchId },
+    data: { points: null },
+  });
+
+  await logAction(
+    session.user.id,
+    session.user.name ?? "",
+    `zerou resultado de ${match.homeTeam} × ${match.awayTeam}`
+  , getIp(req));
+
+  return NextResponse.json(match);
+}
+
 // PUT: Save special results (champion / top scorer)
 export async function PUT(req: Request) {
   const session = await getServerSession(authOptions);

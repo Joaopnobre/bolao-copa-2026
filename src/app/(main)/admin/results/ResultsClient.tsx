@@ -75,7 +75,14 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
     });
   };
 
-  const pendingMatches = applyFilters(matches);
+  const pendingMatches  = applyFilters(matches.filter((m) => m.status !== "FINISHED"));
+  const finishedMatches = applyFilters(matches.filter((m) => m.status === "FINISHED"));
+
+  const rowValue = (match: any) =>
+    results[match.id] ?? {
+      home: match.homeScore !== null && match.homeScore !== undefined ? String(match.homeScore) : "",
+      away: match.awayScore !== null && match.awayScore !== undefined ? String(match.awayScore) : "",
+    };
 
   return (
     <div>
@@ -123,7 +130,7 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
       )}
 
       {/* Pending matches — sempre abertos para atualizar em tempo real */}
-      {pendingMatches.length > 0 ? (
+      {pendingMatches.length > 0 && (
         <div style={{ marginBottom: 24 }}>
           <h2 style={{ fontSize: 15, fontWeight: 700, color: "#f5a623", marginBottom: 12 }}>⏳ Jogos Pendentes ({pendingMatches.length})</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
@@ -131,7 +138,7 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
               <MatchResultRow
                 key={match.id}
                 match={match}
-                value={results[match.id] ?? { home: "", away: "" }}
+                value={rowValue(match)}
                 onChange={(v) => setResults((r) => ({ ...r, [match.id]: v }))}
                 onSave={() => saveResult(match.id)}
                 saving={saving === match.id}
@@ -140,10 +147,33 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
             ))}
           </div>
         </div>
-      ) : (
+      )}
+
+      {/* Finished matches — editáveis para correção de placar */}
+      {finishedMatches.length > 0 && (
+        <div style={{ marginBottom: 24 }}>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: "#00d4aa", marginBottom: 12 }}>✅ Jogos Finalizados ({finishedMatches.length})</h2>
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {finishedMatches.map((match) => (
+              <MatchResultRow
+                key={match.id}
+                match={match}
+                value={rowValue(match)}
+                onChange={(v) => setResults((r) => ({ ...r, [match.id]: v }))}
+                onSave={() => saveResult(match.id)}
+                saving={saving === match.id}
+                feedback={feedback[match.id] ?? ""}
+                finished
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {pendingMatches.length === 0 && finishedMatches.length === 0 && (
         <div style={{ textAlign: "center", padding: "48px 24px", color: "var(--text-secondary)" }}>
-          <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
-          <div style={{ fontSize: 16, fontWeight: 600 }}>Todos os resultados já foram inseridos!</div>
+          <div style={{ fontSize: 48, marginBottom: 12 }}>⚽</div>
+          <div style={{ fontSize: 16, fontWeight: 600 }}>Nenhum jogo cadastrado.</div>
         </div>
       )}
     </div>
@@ -168,7 +198,7 @@ function AdminPillBtn({ active, onClick, children }: { active: boolean; onClick:
 }
 
 function MatchResultRow({
-  match, value, onChange, onSave, saving, feedback,
+  match, value, onChange, onSave, saving, feedback, finished,
 }: {
   match: any;
   value: { home: string; away: string };
@@ -176,12 +206,13 @@ function MatchResultRow({
   onSave: () => void;
   saving: boolean;
   feedback: string;
+  finished?: boolean;
 }) {
   return (
     <div
       style={{
         background: "var(--bg-card)",
-        border: "1px solid rgba(245,166,35,0.3)",
+        border: `1px solid ${finished ? "rgba(0,212,170,0.3)" : "rgba(245,166,35,0.3)"}`,
         borderRadius: 12,
         padding: "12px 16px",
         display: "flex",

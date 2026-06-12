@@ -9,7 +9,6 @@ export default async function ResultsPage() {
   if (!session || session.user.role !== "ADMIN") redirect("/dashboard");
 
   const matches = await prisma.match.findMany({
-    where: { status: { in: ["LOCKED", "UPCOMING"] } },
     orderBy: [{ sortOrder: "asc" }, { matchDate: "asc" }],
   });
 

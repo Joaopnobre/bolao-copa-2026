@@ -75,8 +75,7 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
     });
   };
 
-  const lockedMatches = applyFilters(matches.filter((m) => m.status === "LOCKED"));
-  const upcomingMatches = applyFilters(matches.filter((m) => m.status === "UPCOMING"));
+  const pendingMatches = applyFilters(matches);
 
   return (
     <div>
@@ -123,12 +122,12 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
         </div>
       )}
 
-      {/* Locked matches */}
-      {lockedMatches.length > 0 && (
+      {/* Pending matches — sempre abertos para atualizar em tempo real */}
+      {pendingMatches.length > 0 ? (
         <div style={{ marginBottom: 24 }}>
-          <h2 style={{ fontSize: 15, fontWeight: 700, color: "#f5a623", marginBottom: 12 }}>⏳ Jogos Bloqueados ({lockedMatches.length})</h2>
+          <h2 style={{ fontSize: 15, fontWeight: 700, color: "#f5a623", marginBottom: 12 }}>⏳ Jogos Pendentes ({pendingMatches.length})</h2>
           <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {lockedMatches.map((match) => (
+            {pendingMatches.map((match) => (
               <MatchResultRow
                 key={match.id}
                 match={match}
@@ -141,30 +140,7 @@ export function ResultsClient({ matches, officialChampion, officialScorer }: Pro
             ))}
           </div>
         </div>
-      )}
-
-      {/* Upcoming matches */}
-      {upcomingMatches.length > 0 && (
-        <div>
-          <h2 style={{ fontSize: 14, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 12 }}>
-            ℹ️ Próximos Jogos (ainda não bloqueados)
-          </h2>
-          <div style={{ opacity: 0.6, display: "flex", flexDirection: "column", gap: 8 }}>
-            {upcomingMatches.slice(0, 5).map((match) => (
-              <div key={match.id} style={{ background: "var(--bg-card)", border: "1px solid var(--border-color)", borderRadius: 10, padding: "10px 16px", display: "flex", gap: 12, alignItems: "center", fontSize: 13 }}>
-                <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{match.homeTeam}</span>
-                <span style={{ color: "var(--text-secondary)" }}>×</span>
-                <span style={{ fontWeight: 600, color: "var(--text-primary)" }}>{match.awayTeam}</span>
-                <span style={{ marginLeft: "auto", color: "var(--text-secondary)", fontSize: 11 }}>
-                  {new Date(match.matchDate).toLocaleString("pt-BR")}
-                </span>
-              </div>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {lockedMatches.length === 0 && upcomingMatches.length === 0 && (
+      ) : (
         <div style={{ textAlign: "center", padding: "48px 24px", color: "var(--text-secondary)" }}>
           <div style={{ fontSize: 48, marginBottom: 12 }}>✅</div>
           <div style={{ fontSize: 16, fontWeight: 600 }}>Todos os resultados já foram inseridos!</div>

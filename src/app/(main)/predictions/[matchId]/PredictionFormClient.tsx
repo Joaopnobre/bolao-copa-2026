@@ -8,6 +8,7 @@ import { calculateOdd, ODDS_CONFIG } from "@/lib/odds";
 const PHASE_LABELS: Record<string, string> = {
   GROUP: "Fase de Grupos",
   ROUND_OF_16: "16 Avos",
+  ROUND_OF_8: "Oitavas",
   QUARTER_FINAL: "Quartas",
   SEMI_FINAL: "Semifinal",
   THIRD_PLACE: "3º Lugar",

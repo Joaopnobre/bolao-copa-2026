@@ -229,6 +229,7 @@ body {
 /* ── Phase labels ── */
 .phase-GROUP         { color: var(--verde-escuro); font-weight: 600; }
 .phase-ROUND_OF_16   { color: var(--azul);         font-weight: 600; }
+.phase-ROUND_OF_8    { color: #8b5cf6;             font-weight: 600; }
 .phase-QUARTER_FINAL { color: var(--ouro-escuro);  font-weight: 600; }
 .phase-SEMI_FINAL    { color: #ea580c;              font-weight: 600; }
 .phase-THIRD_PLACE   { color: var(--verde);         font-weight: 600; }

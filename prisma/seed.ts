@@ -25,6 +25,7 @@ const prisma = buildPrisma();
 const MatchPhase = {
   GROUP: "GROUP",
   ROUND_OF_16: "ROUND_OF_16",
+  ROUND_OF_8: "ROUND_OF_8",
   QUARTER_FINAL: "QUARTER_FINAL",
   SEMI_FINAL: "SEMI_FINAL",
   THIRD_PLACE: "THIRD_PLACE",
@@ -158,24 +159,26 @@ const knockoutMatches = [
   { homeTeam: "2º D", awayTeam: "2º G", phase: MatchPhase.ROUND_OF_16, excelDay: 46206, time: "15:00", sortOrder: 113 },
   { homeTeam: "1º B", awayTeam: "3º EFGIJ", phase: MatchPhase.ROUND_OF_16, excelDay: 46206, time: "00:00", sortOrder: 114 },
   { homeTeam: "1º K", awayTeam: "3º DEIJL", phase: MatchPhase.ROUND_OF_16, excelDay: 46206, time: "22:30", sortOrder: 115 },
-  // Quarter-finals
-  { homeTeam: "Jogo 51", awayTeam: "Jogo 52", phase: MatchPhase.QUARTER_FINAL, excelDay: 46207, time: "18:00", sortOrder: 200 },
-  { homeTeam: "Jogo 53", awayTeam: "Jogo 54", phase: MatchPhase.QUARTER_FINAL, excelDay: 46207, time: "14:00", sortOrder: 201 },
-  { homeTeam: "Jogo 55", awayTeam: "Jogo 56", phase: MatchPhase.QUARTER_FINAL, excelDay: 46208, time: "17:00", sortOrder: 202 },
-  { homeTeam: "Jogo 57", awayTeam: "Jogo 58", phase: MatchPhase.QUARTER_FINAL, excelDay: 46208, time: "21:00", sortOrder: 203 },
-  { homeTeam: "Jogo 59", awayTeam: "Jogo 60", phase: MatchPhase.QUARTER_FINAL, excelDay: 46209, time: "16:00", sortOrder: 204 },
-  { homeTeam: "Jogo 61", awayTeam: "Jogo 62", phase: MatchPhase.QUARTER_FINAL, excelDay: 46209, time: "21:00", sortOrder: 205 },
-  { homeTeam: "Jogo 63", awayTeam: "Jogo 64", phase: MatchPhase.QUARTER_FINAL, excelDay: 46210, time: "13:00", sortOrder: 206 },
-  { homeTeam: "Jogo 65", awayTeam: "Jogo 66", phase: MatchPhase.QUARTER_FINAL, excelDay: 46210, time: "17:00", sortOrder: 207 },
-  // Semi-finals
-  { homeTeam: "Vencedor QF1", awayTeam: "Vencedor QF2", phase: MatchPhase.SEMI_FINAL, excelDay: 46212, time: "17:00", sortOrder: 300 },
-  { homeTeam: "Vencedor QF3", awayTeam: "Vencedor QF4", phase: MatchPhase.SEMI_FINAL, excelDay: 46213, time: "16:00", sortOrder: 301 },
-  { homeTeam: "Vencedor QF5", awayTeam: "Vencedor QF6", phase: MatchPhase.SEMI_FINAL, excelDay: 46214, time: "18:00", sortOrder: 302 },
-  { homeTeam: "Vencedor QF7", awayTeam: "Vencedor QF8", phase: MatchPhase.SEMI_FINAL, excelDay: 46214, time: "22:00", sortOrder: 303 },
-  // Third place
-  { homeTeam: "Perdedor SF1", awayTeam: "Perdedor SF2", phase: MatchPhase.THIRD_PLACE, excelDay: 46221, time: "18:00", sortOrder: 400 },
-  { homeTeam: "Perdedor SF3", awayTeam: "Perdedor SF4", phase: MatchPhase.THIRD_PLACE, excelDay: 46221, time: "18:00", sortOrder: 401 },
-  // Final
+  // Oitavas de Final (Round of 16 — vencedores dos 16 avos)
+  { homeTeam: "Jogo 51", awayTeam: "Jogo 52", phase: MatchPhase.ROUND_OF_8, excelDay: 46207, time: "18:00", sortOrder: 200 },
+  { homeTeam: "Jogo 53", awayTeam: "Jogo 54", phase: MatchPhase.ROUND_OF_8, excelDay: 46207, time: "14:00", sortOrder: 201 },
+  { homeTeam: "Jogo 55", awayTeam: "Jogo 56", phase: MatchPhase.ROUND_OF_8, excelDay: 46208, time: "17:00", sortOrder: 202 },
+  { homeTeam: "Jogo 57", awayTeam: "Jogo 58", phase: MatchPhase.ROUND_OF_8, excelDay: 46208, time: "21:00", sortOrder: 203 },
+  { homeTeam: "Jogo 59", awayTeam: "Jogo 60", phase: MatchPhase.ROUND_OF_8, excelDay: 46209, time: "16:00", sortOrder: 204 },
+  { homeTeam: "Jogo 61", awayTeam: "Jogo 62", phase: MatchPhase.ROUND_OF_8, excelDay: 46209, time: "21:00", sortOrder: 205 },
+  { homeTeam: "Jogo 63", awayTeam: "Jogo 64", phase: MatchPhase.ROUND_OF_8, excelDay: 46210, time: "13:00", sortOrder: 206 },
+  { homeTeam: "Jogo 65", awayTeam: "Jogo 66", phase: MatchPhase.ROUND_OF_8, excelDay: 46210, time: "17:00", sortOrder: 207 },
+  // Quartas de Final (vencedores das oitavas)
+  { homeTeam: "Vencedor OT1", awayTeam: "Vencedor OT2", phase: MatchPhase.QUARTER_FINAL, excelDay: 46212, time: "17:00", sortOrder: 300 },
+  { homeTeam: "Vencedor OT3", awayTeam: "Vencedor OT4", phase: MatchPhase.QUARTER_FINAL, excelDay: 46213, time: "16:00", sortOrder: 301 },
+  { homeTeam: "Vencedor OT5", awayTeam: "Vencedor OT6", phase: MatchPhase.QUARTER_FINAL, excelDay: 46214, time: "18:00", sortOrder: 302 },
+  { homeTeam: "Vencedor OT7", awayTeam: "Vencedor OT8", phase: MatchPhase.QUARTER_FINAL, excelDay: 46214, time: "22:00", sortOrder: 303 },
+  // Semifinal (vencedores das quartas — Jul 14-15)
+  { homeTeam: "Vencedor QF1", awayTeam: "Vencedor QF2", phase: MatchPhase.SEMI_FINAL, excelDay: 46217, time: "17:00", sortOrder: 400 },
+  { homeTeam: "Vencedor QF3", awayTeam: "Vencedor QF4", phase: MatchPhase.SEMI_FINAL, excelDay: 46218, time: "17:00", sortOrder: 401 },
+  // Disputa de 3º Lugar (Jul 18)
+  { homeTeam: "Perdedor SF1", awayTeam: "Perdedor SF2", phase: MatchPhase.THIRD_PLACE, excelDay: 46221, time: "18:00", sortOrder: 450 },
+  // Final (Jul 19)
   { homeTeam: "Vencedor SF1", awayTeam: "Vencedor SF2", phase: MatchPhase.FINAL, excelDay: 46222, time: "16:00", sortOrder: 500 },
 ];
 

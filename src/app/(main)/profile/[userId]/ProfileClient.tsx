@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { PageHeader } from "@/components/ui/PageHeader";
 
 const PHASE_LABELS: Record<string, string> = {
-  GROUP: "Grupos", ROUND_OF_16: "16 Avos", QUARTER_FINAL: "Quartas",
+  GROUP: "Grupos", ROUND_OF_16: "16 Avos", ROUND_OF_8: "Oitavas", QUARTER_FINAL: "Quartas",
   SEMI_FINAL: "Semi", THIRD_PLACE: "3º Lugar", FINAL: "Final",
 };
 

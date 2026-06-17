@@ -47,6 +47,7 @@ const GROUP_COLORS: Record<string, { bg: string; border: string; label: string }
 const PHASE_LABELS: Record<string, string> = {
   GROUP: "Grupos",
   ROUND_OF_16: "16 Avos",
+  ROUND_OF_8: "Oitavas",
   QUARTER_FINAL: "Quartas",
   SEMI_FINAL: "Semi",
   THIRD_PLACE: "3º Lugar",

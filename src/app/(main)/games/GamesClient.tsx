@@ -8,13 +8,14 @@ import { PageHeader } from "@/components/ui/PageHeader";
 const PHASE_LABELS: Record<string, string> = {
   GROUP: "Fase de Grupos",
   ROUND_OF_16: "16 Avos de Final",
+  ROUND_OF_8: "Oitavas de Final",
   QUARTER_FINAL: "Quartas de Final",
   SEMI_FINAL: "Semifinal",
   THIRD_PLACE: "Disputa 3º Lugar",
   FINAL: "Final",
 };
 
-const PHASE_ORDER = ["GROUP", "ROUND_OF_16", "QUARTER_FINAL", "SEMI_FINAL", "THIRD_PLACE", "FINAL"];
+const PHASE_ORDER = ["GROUP", "ROUND_OF_16", "ROUND_OF_8", "QUARTER_FINAL", "SEMI_FINAL", "THIRD_PLACE", "FINAL"];
 
 interface Props {
   matches: any[];
@@ -210,7 +211,7 @@ function FilterButton({
 }
 
 function SectionTitle({ title, count, phase }: { title: string; count: number; phase?: string }) {
-  const color = phase === "FINAL" ? "#ffd700" : phase === "SEMI_FINAL" ? "#f97316" : phase === "QUARTER_FINAL" ? "#f59e0b" : "#60a5fa";
+  const color = phase === "FINAL" ? "#ffd700" : phase === "SEMI_FINAL" ? "#f97316" : phase === "QUARTER_FINAL" ? "#f59e0b" : phase === "ROUND_OF_8" ? "#8b5cf6" : "#60a5fa";
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 12 }}>
       <h2 style={{ fontSize: 16, fontWeight: 700, color, margin: 0 }}>{title}</h2>

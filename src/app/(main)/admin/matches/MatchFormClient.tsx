@@ -7,6 +7,7 @@ import { PageHeader } from "@/components/ui/PageHeader";
 const PHASES = [
   { value: "GROUP", label: "Fase de Grupos" },
   { value: "ROUND_OF_16", label: "16 Avos" },
+  { value: "ROUND_OF_8", label: "Oitavas de Final" },
   { value: "QUARTER_FINAL", label: "Quartas de Final" },
   { value: "SEMI_FINAL", label: "Semifinal" },
   { value: "THIRD_PLACE", label: "3º Lugar" },

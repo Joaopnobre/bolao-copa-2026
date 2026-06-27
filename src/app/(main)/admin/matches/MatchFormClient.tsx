@@ -14,6 +14,24 @@ const PHASES = [
   { value: "FINAL", label: "Final" },
 ];
 
+// O input datetime-local não carrega fuso horário — o valor digitado é sempre
+// tratado como horário de Brasília (UTC-3), independente do fuso da máquina/navegador
+// de quem está preenchendo. Mesma lógica usada em prisma/seed.ts (excelDate).
+function brtInputToUtcIso(localStr: string): string {
+  const [datePart, timePart] = localStr.split("T");
+  const [y, m, d] = datePart.split("-").map(Number);
+  const [h, min] = timePart.split(":").map(Number);
+  const utcMs = Date.UTC(y, m - 1, d, h, min) + 3 * 60 * 60 * 1000;
+  return new Date(utcMs).toISOString();
+}
+
+function utcIsoToBrtInput(isoStr: string): string {
+  const utcMs = new Date(isoStr).getTime();
+  const brt = new Date(utcMs - 3 * 60 * 60 * 1000);
+  const pad = (n: number) => String(n).padStart(2, "0");
+  return `${brt.getUTCFullYear()}-${pad(brt.getUTCMonth() + 1)}-${pad(brt.getUTCDate())}T${pad(brt.getUTCHours())}:${pad(brt.getUTCMinutes())}`;
+}
+
 interface Props { match?: any }
 
 export function MatchFormClient({ match }: Props) {
@@ -23,7 +41,7 @@ export function MatchFormClient({ match }: Props) {
   const [homeTeam, setHomeTeam] = useState(match?.homeTeam ?? "");
   const [awayTeam, setAwayTeam] = useState(match?.awayTeam ?? "");
   const [matchDate, setMatchDate] = useState(
-    match?.matchDate ? new Date(match.matchDate).toISOString().slice(0, 16) : ""
+    match?.matchDate ? utcIsoToBrtInput(match.matchDate) : ""
   );
   const [phase, setPhase] = useState(match?.phase ?? "GROUP");
   const [groupName, setGroupName] = useState(match?.groupName ?? "");
@@ -44,7 +62,7 @@ export function MatchFormClient({ match }: Props) {
       const body = {
         homeTeam: homeTeam.trim(),
         awayTeam: awayTeam.trim(),
-        matchDate: new Date(matchDate).toISOString(),
+        matchDate: brtInputToUtcIso(matchDate),
         phase,
         groupName: phase === "GROUP" ? groupName.trim() : null,
         round: round ? parseInt(round) : null,
@@ -107,7 +125,7 @@ export function MatchFormClient({ match }: Props) {
 
           <div>
             <label style={{ display: "block", fontSize: 12, fontWeight: 600, color: "var(--text-secondary)", marginBottom: 6, textTransform: "uppercase", letterSpacing: 0.5 }}>
-              Data e Hora *
+              Data e Hora * (horário de Brasília)
             </label>
             <input className="input-field" type="datetime-local" value={matchDate} onChange={(e) => setMatchDate(e.target.value)} />
           </div>
